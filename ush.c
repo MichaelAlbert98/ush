@@ -1,4 +1,4 @@
-/* CS 347 -- Micro Shell!
+/*   CS 347 -- Micro Shell!
  *
  *   Sept 21, 2000,  Phil Nelson
  *   Modified April 8, 2001
@@ -6,7 +6,7 @@
  *   Modified January 8, 2017
  *
  *   April 03, 2019, Michael Albert
- *   Modified April 8, 2019
+ *   Modified April 9, 2019
  *
  */
 
@@ -17,9 +17,6 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-/* New include */
-#include <ctype.h>
-
 
 /* Constants */
 
@@ -61,12 +58,11 @@ main (void)
     return 0;		/* Also known as exit (0); */
 }
 
-
 void processline (char *line)
 {
     pid_t  cpid;
     int    status;
-    int* argcptr = malloc(sizeof(int));
+    int*   argcptr = malloc(sizeof(int));
     char** parsedArgs = arg_parse(line, argcptr);
 
     /* Return if no args or out of memory */
@@ -103,12 +99,13 @@ void processline (char *line)
     free(parsedArgs);
 }
 
+/* Start of code by Michael Albert */
 char ** arg_parse (char *line, int *argcptr)
 {
-    int    argc;
-    size_t len;
-    int    ix, jx;
-    char** returnVal;
+    int    argc; //keeps track of total args
+    size_t len; //length of user input
+    int    ix, jx; //iterators
+    char** returnVal; //return value
 
     argc = 0;
     len = strlen(line);
@@ -139,7 +136,7 @@ char ** arg_parse (char *line, int *argcptr)
         jx++;
       }
     }
-    
+
     /* Set final char* to NULL */
     returnVal[jx] = NULL;
     /* Modify value argcptr points to */
@@ -147,3 +144,4 @@ char ** arg_parse (char *line, int *argcptr)
 
     return returnVal;
 }
+/* End of code by Michael Albert */
