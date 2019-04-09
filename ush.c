@@ -82,7 +82,7 @@ void processline (char *line)
     /* Check for who we are! */
     if (cpid == 0) {
       /* We are the child! */
-      execvp (line, parsedArgs);
+      execvp (parsedArgs[0], parsedArgs);
       /* execvp reurned, wasn't successful */
       perror ("exec");
       fclose(stdin);  // avoid a linux stdio bug
@@ -100,7 +100,7 @@ void processline (char *line)
 }
 
 /* Start of code by Michael Albert */
-char ** arg_parse (char *line, int *argcptr)
+char** arg_parse (char *line, int *argcptr)
 {
     int    argc; //keeps track of total args
     size_t len; //length of user input
