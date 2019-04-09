@@ -66,7 +66,7 @@ void processline (char *line)
 {
     pid_t  cpid;
     int    status;
-    int* argcptr = malloc(sizeOf(int));
+    int* argcptr = malloc(sizeof(int));
     char** parsedArgs = arg_parse(line, argcptr);
 
     /* Return if no args or out of memory */
@@ -116,14 +116,14 @@ char ** arg_parse (char *line, int *argcptr)
     /* Break up line on spaces */
     for (ix=1; ix<len; ix++) {
       /* Ignore multiple spaces */
-      if (line[ix] == ' ' && line[ix-1] != ' ') {
-        line[ix] = '0';
+      if (line[ix] == ' ' && (line[ix-1] != ' ' && line[ix-1] != '\0')) {
+        line[ix] = '\0';
         argc++;
       }
     }
 
     /* Allocate exact amount of space */
-    returnVal = malloc(sizeOf(char*)*(argc+1));
+    returnVal = malloc(sizeof(char*)*(argc+1));
 
     /* Check if enough memory */
     if (returnVal == 0) {
@@ -134,11 +134,12 @@ char ** arg_parse (char *line, int *argcptr)
     /* Point to first char of each arg */
     for (ix=0,jx=0; ix<len; ix++) {
       /* Make sure we find first char of each arg */
-      if (line[ix] != ' ' && (ix==0 || line[ix-1] == ' ')) {
+      if (line[ix] != ' ' && (ix==0 || line[ix-1] == ' ' || line[ix-1] == '\0')) {
         returnVal[jx] = &line[ix];
         jx++;
       }
     }
+    
     /* Set final char* to NULL */
     returnVal[jx] = NULL;
     /* Modify value argcptr points to */
