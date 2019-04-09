@@ -62,12 +62,12 @@ void processline (char *line)
 {
     pid_t  cpid;
     int    status;
-    int*   argcptr = malloc(sizeof(int));
-    char** parsedArgs = arg_parse(line, argcptr);
+    int    argcptr;
+    char** parsedArgs = arg_parse(line, &argcptr);
 
-    /* Return if no args or out of memory */
-    if (parsedArgs == NULL) {
-      perror ("no args");
+    /* Return if no args */
+    if (argcptr == 0) {
+      printf("No arguments.\n");
       return;
     }
 
@@ -110,11 +110,10 @@ char** arg_parse (char *line, int *argcptr)
     argc = 0;
     len = strlen(line);
 
-    /* Break up line on spaces */
-    for (ix=1; ix<len; ix++) {
+    /* Find number of args */
+    for (ix=1; ix<=len; ix++) {
       /* Ignore multiple spaces */
-      if (line[ix] == ' ' && (line[ix-1] != ' ' && line[ix-1] != '\0')) {
-        line[ix] = '\0';
+      if ((line[ix] == ' ' || line[ix] == 0) && line[ix-1] != ' ') {
         argc++;
       }
     }
@@ -131,9 +130,16 @@ char** arg_parse (char *line, int *argcptr)
     /* Point to first char of each arg */
     for (ix=0,jx=0; ix<len; ix++) {
       /* Make sure we find first char of each arg */
-      if (line[ix] != ' ' && (ix==0 || line[ix-1] == ' ' || line[ix-1] == '\0')) {
+      if (line[ix] != ' ' && (ix==0 || line[ix-1] == ' ')) {
         returnVal[jx] = &line[ix];
         jx++;
+      }
+    }
+
+    /* Separate args with 0's */
+    for (ix=1; ix<len; ix++) {
+      if (line[ix] == ' ' && line[ix-1] != ' ') {
+        line[ix] = '\0';
       }
     }
 
