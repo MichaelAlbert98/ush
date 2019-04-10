@@ -6,7 +6,7 @@
  *   Modified January 8, 2017
  *
  *   April 03, 2019, Michael Albert
- *   Modified April 9, 2019
+ *   Modified April 10, 2019
  *
  */
 
@@ -26,6 +26,7 @@
 
 void processline (char *line);
 char ** arg_parse (char *line, int *argcptr);
+void removequotes(char *line);
 
 /* Shell main */
 
@@ -64,6 +65,18 @@ void processline (char *line)
     int    status;
     int    argcptr;
     char** parsedArgs = arg_parse(line, &argcptr);
+
+    /* Return if no memory allocated */
+    if (parsedArgs == NULL) {
+      fprintf(stderr, "Memory not allocated\n");
+      return;
+    }
+
+    /* Return if no memory allocated */
+    if (parsedArgs[0] == "fake") {
+      fprintf(stderr, "Mismatched quotes.\n");
+      return;
+    }
 
     /* Return if no args */
     if (argcptr == 0) {
@@ -105,16 +118,44 @@ char** arg_parse (char *line, int *argcptr)
     int    argc; //keeps track of total args
     size_t len; //length of user input
     int    ix, jx; //iterators
+    char* startArg; //start of argument
     char** returnVal; //return value
 
     argc = 0;
     len = strlen(line);
 
     /* Find number of args */
-    for (ix=1; ix<=len; ix++) {
-      /* Ignore multiple spaces */
-      if ((line[ix] == ' ' || line[ix] == 0) && line[ix-1] != ' ') {
+    ix = 0;
+    while (line[ix] != 0) {
+      /* Skip spaces */
+      while (line[ix] == ' ') {
+        ix++;
+      }
+      /* Add argument */
+      if (line[ix] != ' ') {
         argc++;
+        /* Loop to end of arg */
+        while (line[ix] != ' ' && line[ix] != 0) {
+          if (line[ix] != '\"') {
+            ix++;
+          }
+          /* Anything within quotes counts as arg */
+          else {
+            ix++;
+            /* Find end of quotes */
+            while (line[ix] != '\"') {
+              ix++;
+              /* Mismatched quotes gives error */
+              if (line[ix] == 0) {
+                //not sure what to put here
+                returnVal = malloc(sizeof(char*));
+                returnVal[0] = "fake";
+                return returnVal;
+              }
+            }
+            ix++;
+          }
+        }
       }
     }
 
@@ -122,24 +163,43 @@ char** arg_parse (char *line, int *argcptr)
     returnVal = malloc(sizeof(char*)*(argc+1));
 
     /* Check if enough memory */
-    if (returnVal == 0) {
-      perror ("memory");
+    if (returnVal == NULL) {
       return returnVal;
     }
 
-    /* Point to first char of each arg */
-    for (ix=0,jx=0; ix<len; ix++) {
-      /* Make sure we find first char of each arg */
-      if (line[ix] != ' ' && (ix==0 || line[ix-1] == ' ')) {
-        returnVal[jx] = &line[ix];
-        jx++;
+    /* Assign pointers and EoS values to args */
+    ix = 0;
+    jx = 0;
+    while (line[ix] != 0) {
+      /* Skip spaces */
+      while (line[ix] == ' ') {
+        ix++;
       }
-    }
-
-    /* Separate args with 0's */
-    for (ix=1; ix<len; ix++) {
-      if (line[ix] == ' ' && line[ix-1] != ' ') {
-        line[ix] = '\0';
+      /* Add pointer to start of arg */
+      if (line[ix] != ' ' && line[ix] != 0) {
+        startArg = &line[ix];
+        returnVal[jx] = startArg;
+        jx++;
+        /* Loop to end of arg */
+        while (line[ix] != ' ' && line[ix] != 0) {
+          if (line[ix] != '\"') {
+            ix++;
+          }
+          /* Anything within quotes counts as arg */
+          else {
+            ix++;
+            /* Find end of quotes */
+            while (line[ix] != '\"') {
+              ix++;
+            }
+            ix++;
+          }
+        }
+        /* Add EoS value to end of arg */
+        line[ix] = 0;
+        ix++;
+        /* Remove quotes from arg */
+        removequotes(startArg);
       }
     }
 
@@ -149,5 +209,29 @@ char** arg_parse (char *line, int *argcptr)
     *argcptr = argc;
 
     return returnVal;
+}
+
+void removequotes (char *line) {
+  int src;
+  int dst;
+
+
+  /* Remove quotes from the arg */
+  src = 0;
+  dst = 0;
+  while (line[src] != 0) {
+    /* Bring directly over if no quote */
+    if (line[src] != '\"') {
+      line[dst] = line[src];
+      src++;
+      dst++;
+    }
+    /* Shift by one if quote */
+    else {
+      src++;
+      line[dst] = line[src];
+    }
+  }
+  line[dst] = line[src];
 }
 /* End of code by Michael Albert */
