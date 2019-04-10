@@ -1,0 +1,16 @@
+/home/skullbot/Desktop/csci347_s19/ush
+"I have the high ground!"
+This night methinks is but the daylight sick.
+		-- William Shakespeare, "The Merchant of Venice"
+total 28
+-rwxr-xr-x 1 skullbot skullbot   190 Apr  9 21:11 demo.sh
+-rw-r--r-- 1 skullbot skullbot   162 Apr  9 21:12 script-nq
+-rwxr-xr-x 1 skullbot skullbot 13120 Apr  9 20:36 ush
+-rw-r--r-- 1 skullbot skullbot  3141 Apr  9 18:23 ush.c
+total 36
+drwxr-xr-x 2 skullbot skullbot  4096 Apr  9 21:12 .
+drwxr-xr-x 4 skullbot skullbot  4096 Apr  8 19:14 ..
+-rwxr-xr-x 1 skullbot skullbot   190 Apr  9 21:11 demo.sh
+-rw-r--r-- 1 skullbot skullbot   399 Apr  9 21:12 script-nq
+-rwxr-xr-x 1 skullbot skullbot 13120 Apr  9 20:36 ush
+-rw-r--r-- 1 skullbot skullbot  3141 Apr  9 18:23 ush.c
