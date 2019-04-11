@@ -1,0 +1,30 @@
+Script started on Thu 11 Apr 2019 01:56:54 PM PDT
+albertm4@cf167-24:~/csci347/csci347_s19/ush$ ./ush
+% ls
+Script	ush  ush.c
+%        ls
+Script	ush  ush.c
+% ls        -a         
+.  ..  Script  ush  ush.c
+% echo "No quotes here."
+No quotes here.
+% mkdir "This is one arg"
+% mkdir"Still "one" arg"                  "Still"  "one" arg"
+% ls "-a" "-l"
+total 44
+drwxr-xr-x 4 albertm4 grp.csci.Students     7 Apr 11 13:57 .
+drwxr-xr-x 4 albertm4 grp.csci.Students     5 Apr  9 09:32 ..
+-rw-r--r-- 1 albertm4 grp.csci.Students     0 Apr 11 13:56 Script
+drwxr-xr-x 2 albertm4 grp.csci.Students     2 Apr 11 13:57 Still one arg
+drwxr-xr-x 2 albertm4 grp.csci.Students     2 Apr 11 13:57 This is one arg
+-rwxr-xr-x 1 albertm4 grp.csci.Students 16664 Apr 11 13:40 ush
+-rw-r--r-- 1 albertm4 grp.csci.Students  4705 Apr 11 13:40 ush.c
+% echo "Mismatched quotes are bad!
+Mismatched quotes.
+% 
+No arguments.
+% ^C
+albertm4@cf167-24:~/csci347/csci347_s19/ush$ exit
+exit
+
+Script done on Thu 11 Apr 2019 01:58:17 PM PDT
