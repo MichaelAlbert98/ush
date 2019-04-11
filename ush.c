@@ -6,7 +6,7 @@
  *   Modified January 8, 2017
  *
  *   April 03, 2019, Michael Albert
- *   Modified April 10, 2019
+ *   Modified April 11, 2019
  *
  */
 
@@ -109,13 +109,11 @@ void processline (char *line)
 char** arg_parse (char *line, int *argcptr)
 {
     int    argc; //keeps track of total args
-    size_t len; //length of user input
     int    ix, jx; //iterators
     char* startArg; //start of argument
     char** returnVal; //return value
 
     argc = 0;
-    len = strlen(line);
 
     /* Find number of args */
     ix = 0;
@@ -218,6 +216,7 @@ void removequotes (char *line) {
     }
   src++;
   }
+
   line[dst] = 0;
   return;
 }
