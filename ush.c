@@ -66,15 +66,8 @@ void processline (char *line)
     int    argcptr;
     char** parsedArgs = arg_parse(line, &argcptr);
 
-    /* Return if no memory allocated */
+    /* Return if error in arg_parse */
     if (parsedArgs == NULL) {
-      fprintf(stderr, "Memory not allocated\n");
-      return;
-    }
-
-    /* Return if no memory allocated */
-    if (parsedArgs[0] == "fake") {
-      fprintf(stderr, "Mismatched quotes.\n");
       return;
     }
 
@@ -147,9 +140,8 @@ char** arg_parse (char *line, int *argcptr)
               ix++;
               /* Mismatched quotes gives error */
               if (line[ix] == 0) {
-                //not sure what to put here
-                returnVal = malloc(sizeof(char*));
-                returnVal[0] = "fake";
+                fprintf(stderr, "Mismatched quotes.\n");
+                returnVal = NULL;
                 return returnVal;
               }
             }
@@ -164,6 +156,7 @@ char** arg_parse (char *line, int *argcptr)
 
     /* Check if enough memory */
     if (returnVal == NULL) {
+      fprintf(stderr, "Memory not allocated\n");
       return returnVal;
     }
 
@@ -212,9 +205,7 @@ char** arg_parse (char *line, int *argcptr)
 }
 
 void removequotes (char *line) {
-  int src;
-  int dst;
-
+  int src, dst; //iterators
 
   /* Remove quotes from the arg */
   src = 0;
@@ -223,15 +214,11 @@ void removequotes (char *line) {
     /* Bring directly over if no quote */
     if (line[src] != '\"') {
       line[dst] = line[src];
-      src++;
       dst++;
     }
-    /* Shift by one if quote */
-    else {
-      src++;
-      line[dst] = line[src];
-    }
+  src++;
   }
-  line[dst] = line[src];
+  line[dst] = 0;
+  return;
 }
 /* End of code by Michael Albert */
