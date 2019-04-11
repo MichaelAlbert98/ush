@@ -1,0 +1,15 @@
+Script started on Thu 11 Apr 2019 02:14:30 PM PDT
+albertm4@cf167-24:~/csci347/csci347_s19/ush$ ./ush
+% ls
+Script	ush  ush.c
+%       ls
+Script	ush  ush.c
+% ls           -a
+.  ..  Script  ush  ush.c
+% echo "Quotes are not parsed."
+"Quotes are not parsed."
+% ^C
+albertm4@cf167-24:~/csci347/csci347_s19/ush$ exit
+exit
+
+Script done on Thu 11 Apr 2019 02:16:42 PM PDT
