@@ -1,10 +1,11 @@
-Script started on Thu 11 Apr 2019 01:56:54 PM PDT
-albertm4@cf167-24:~/csci347/csci347_s19/ush$ ./ush
+Script started on Fri 12 Apr 2019 09:32:20 AM PDT
+albertm4@cf162-09:~/csci347/csci347_s19/ush$ gcc -Wall -o ush ush.c
+albertm4@cf162-09:~/csci347/csci347_s19/ush$ ./ush
 % ls
 Script	ush  ush.c
-%        ls
+%       ls
 Script	ush  ush.c
-% ls        -a
+% ls       -a
 .  ..  Script  ush  ush.c
 % echo "No quotes here."
 No quotes here.
@@ -12,19 +13,19 @@ No quotes here.
 % mkdir "Still "one" arg"
 % ls "-a" "-l"
 total 44
-drwxr-xr-x 4 albertm4 grp.csci.Students     7 Apr 11 13:57 .
+drwxr-xr-x 4 albertm4 grp.csci.Students     7 Apr 12 09:33 .
 drwxr-xr-x 4 albertm4 grp.csci.Students     5 Apr  9 09:32 ..
--rw-r--r-- 1 albertm4 grp.csci.Students     0 Apr 11 13:56 Script
-drwxr-xr-x 2 albertm4 grp.csci.Students     2 Apr 11 13:57 Still one arg
-drwxr-xr-x 2 albertm4 grp.csci.Students     2 Apr 11 13:57 This is one arg
--rwxr-xr-x 1 albertm4 grp.csci.Students 16664 Apr 11 13:40 ush
--rw-r--r-- 1 albertm4 grp.csci.Students  4705 Apr 11 13:40 ush.c
+-rw-r--r-- 1 albertm4 grp.csci.Students     0 Apr 12 09:32 Script
+drwxr-xr-x 2 albertm4 grp.csci.Students     2 Apr 12 09:33 Still one arg
+drwxr-xr-x 2 albertm4 grp.csci.Students     2 Apr 12 09:32 This is one arg
+-rwxr-xr-x 1 albertm4 grp.csci.Students 13616 Apr 12 09:32 ush
+-rw-r--r-- 1 albertm4 grp.csci.Students  4705 Apr 11 14:18 ush.c
 % echo "Mismatched quotes are bad!
 Mismatched quotes.
-%
+% 
 No arguments.
 % ^C
-albertm4@cf167-24:~/csci347/csci347_s19/ush$ exit
+albertm4@cf162-09:~/csci347/csci347_s19/ush$ exit
 exit
 
-Script done on Thu 11 Apr 2019 01:58:17 PM PDT
+Script done on Fri 12 Apr 2019 09:33:27 AM PDT

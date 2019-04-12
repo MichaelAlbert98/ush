@@ -2,7 +2,7 @@
 %%Title: Script
 %%For: Michael Charles Albert
 %%Creator: a2ps version 4.14
-%%CreationDate: Thu Apr 11 14:39:54 2019
+%%CreationDate: Fri Apr 12 09:33:45 2019
 %%BoundingBox: 24 24 588 768
 %%DocumentData: Clean7Bit
 %%Orientation: Landscape
@@ -757,13 +757,14 @@ llx lly 12 add translate
 /x0 x v get 3.147420 add sx cw mul add store
 /y0 y v get bfs th add sub store
 x0 y0 moveto
-(Script started on Thu 11 Apr 2019 01:56:54 PM PDT) p n
-(albertm4@cf167-24:~/csci347/csci347_s19/ush$ ./ush) N
+(Script started on Fri 12 Apr 2019 09:32:20 AM PDT) p n
+(albertm4@cf162-09:~/csci347/csci347_s19/ush$ gcc -Wall -o ush ush.c) N
+(albertm4@cf162-09:~/csci347/csci347_s19/ush$ ./ush) N
 (% ls) N
 (Script) S 8 T (ush  ush.c) N
-(%        ls) N
+(%       ls) N
 (Script) S 8 T (ush  ush.c) N
-(% ls        -a) N
+(% ls       -a) N
 (.  ..  Script  ush  ush.c) N
 (% echo "No quotes here.") N
 (No quotes here.) N
@@ -771,27 +772,27 @@ x0 y0 moveto
 (% mkdir "Still "one" arg") N
 (% ls "-a" "-l") N
 (total 44) N
-(drwxr-xr-x 4 albertm4 grp.csci.Students     7 Apr 11 13:57 .) N
+(drwxr-xr-x 4 albertm4 grp.csci.Students     7 Apr 12 09:33 .) N
 (drwxr-xr-x 4 albertm4 grp.csci.Students     5 Apr  9 09:32 ..) N
-(-rw-r--r-- 1 albertm4 grp.csci.Students     0 Apr 11 13:56 Script) N
-(drwxr-xr-x 2 albertm4 grp.csci.Students     2 Apr 11 13:57 Still one arg) N
-(drwxr-xr-x 2 albertm4 grp.csci.Students     2 Apr 11 13:57 This is one arg) N
-(-rwxr-xr-x 1 albertm4 grp.csci.Students 16664 Apr 11 13:40 ush) N
-(-rw-r--r-- 1 albertm4 grp.csci.Students  4705 Apr 11 13:40 ush.c) N
+(-rw-r--r-- 1 albertm4 grp.csci.Students     0 Apr 12 09:32 Script) N
+(drwxr-xr-x 2 albertm4 grp.csci.Students     2 Apr 12 09:33 Still one arg) N
+(drwxr-xr-x 2 albertm4 grp.csci.Students     2 Apr 12 09:32 This is one arg) N
+(-rwxr-xr-x 1 albertm4 grp.csci.Students 13616 Apr 12 09:32 ush) N
+(-rw-r--r-- 1 albertm4 grp.csci.Students  4705 Apr 11 14:18 ush.c) N
 (% echo "Mismatched quotes are bad!) N
 (Mismatched quotes.) N
-(%) N
+(% ) N
 (No arguments.) N
 (% ^C) N
-(albertm4@cf167-24:~/csci347/csci347_s19/ush$ exit) N
+(albertm4@cf162-09:~/csci347/csci347_s19/ush$ exit) N
 (exit) N
 () N
-(Script done on Thu 11 Apr 2019 01:58:17 PM PDT) N
-(Script) (Page 1/1) (Apr 11, 19 14:39) title
+(Script done on Fri 12 Apr 2019 09:33:27 AM PDT) N
+(Script) (Page 1/1) (Apr 12, 19 9:33) title
 border
 grestore
 (Printed by Michael Charles Albert) rhead
-(Script) (1/1) (Thursday April 11, 2019) footer
+(Script) (1/1) (Friday April 12, 2019) footer
 end % of iso1dict
 pagesave restore
 showpage
