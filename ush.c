@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include "defn.h"
 
 /* Constants */
 
@@ -64,7 +65,23 @@ void processline (char *line)
     pid_t  cpid;
     int    status;
     int    argcptr;
-    char** parsedArgs = arg_parse(line, &argcptr);
+    char   newline [LINELEN]; //Make max size same as LINELEN?
+
+    //This fixes overlapping char issue, but shouldn't be necessary? Look into it.
+    /* Clear newline of characters */
+    for (int ix = 0; ix < LINELEN; ix++) {
+      newline[ix] = 0;
+    }
+
+    /* Expand line and check if error */
+    int expanded = expand(line, newline, LINELEN);
+
+    if (expanded == -1) {
+      return;
+    }
+
+    /* Parse the argument */
+    char** parsedArgs = arg_parse(newline, &argcptr);
 
     /* Return if error in arg_parse */
     if (parsedArgs == NULL) {
