@@ -2,7 +2,7 @@
 
 CC = gcc
 CFLAGS = -g -Wall
-objects = ush.o ush2.o
+objects = ush.o expand.o
 
 ush: $(objects)
 	$(CC) $(CFLAGS) -o ush $(objects)
