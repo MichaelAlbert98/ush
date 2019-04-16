@@ -6,7 +6,7 @@
  *   Modified January 8, 2017
  *
  *   April 03, 2019, Michael Albert
- *   Modified April 11, 2019
+ *   Modified April 16, 2019
  *
  */
 
@@ -65,13 +65,7 @@ void processline (char *line)
     pid_t  cpid;
     int    status;
     int    argcptr;
-    char   newline [LINELEN]; //Make max size same as LINELEN?
-
-    //This fixes overlapping char issue, but shouldn't be necessary? Look into it.
-    /* Clear newline of characters */
-    for (int ix = 0; ix < LINELEN; ix++) {
-      newline[ix] = 0;
-    }
+    char   newline [LINELEN];
 
     /* Expand line and check if error */
     int expanded = expand(line, newline, LINELEN);
@@ -203,9 +197,11 @@ char** arg_parse (char *line, int *argcptr)
             ix++;
           }
         }
-        /* Add EoS value to end of arg */
-        line[ix] = 0;
-        ix++;
+        /* Add EoS value to end of arg if not last arg */
+        if (line[ix] != 0) {
+          line[ix] = 0;
+          ix++;
+        }
         /* Remove quotes from arg */
         removequotes(startArg);
       }
