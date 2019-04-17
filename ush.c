@@ -64,7 +64,7 @@ void processline (char *line)
 {
     pid_t  cpid;
     int    status;
-    int    argcptr;
+    int    argc;
     char   newline [LINELEN];
 
     /* Expand line and check if error */
@@ -75,45 +75,54 @@ void processline (char *line)
     }
 
     /* Parse the argument */
-    char** parsedArgs = arg_parse(newline, &argcptr);
+    char** parsedargs = arg_parse(newline, &argc);
 
     /* Return if error in arg_parse */
-    if (parsedArgs == NULL) {
+    if (parsedargs == NULL) {
       return;
     }
 
     /* Return if no args */
-    if (argcptr == 0) {
+    if (argc == 0) {
       printf("No arguments.\n");
       return;
     }
 
-    /* Start a new process to do the job. */
-    cpid = fork();
-    if (cpid < 0) {
-      /* Fork wasn't successful */
-      perror ("fork");
+    /* Check if builtin and exec if so */
+    if (isbuiltin(parsedargs, argc) == 1) {
+      execbuiltin(parsedargs, argc);
       return;
     }
 
-    /* Check for who we are! */
-    if (cpid == 0) {
-      /* We are the child! */
-      execvp (parsedArgs[0], parsedArgs);
-      /* execvp reurned, wasn't successful */
-      perror ("exec");
-      fclose(stdin);  // avoid a linux stdio bug
-      exit (127);
-    }
+    /* Otherwise fork the process */
+    else {
+      /* Start a new process to do the job. */
+      cpid = fork();
+      if (cpid < 0) {
+        /* Fork wasn't successful */
+        perror ("fork");
+        return;
+      }
 
-    /* Have the parent wait for child to complete */
-    if (wait (&status) < 0) {
-      /* Wait wasn't successful */
-      perror ("wait");
+      /* Check for who we are! */
+      if (cpid == 0) {
+        /* We are the child! */
+        execvp (parsedargs[0], parsedargs);
+        /* execvp reurned, wasn't successful */
+        perror ("exec");
+        fclose(stdin);  // avoid a linux stdio bug
+        exit (127);
+      }
+
+      /* Have the parent wait for child to complete */
+      if (wait (&status) < 0) {
+        /* Wait wasn't successful */
+        perror ("wait");
+      }
     }
 
     /* Free malloc'd space */
-    free(parsedArgs);
+    free(parsedargs);
 }
 
 /* Start of code by Michael Albert */
