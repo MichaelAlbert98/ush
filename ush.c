@@ -84,13 +84,12 @@ void processline (char *line)
 
     /* Return if no args */
     if (argc == 0) {
-      printf("No arguments.\n");
+      fprintf(stderr, "No arguments.\n");
       return;
     }
 
     /* Check if builtin and exec if so */
     if (isbuiltin(parsedargs, argc) == 1) {
-      execbuiltin(parsedargs, argc);
       return;
     }
 
@@ -123,6 +122,7 @@ void processline (char *line)
 
     /* Free malloc'd space */
     free(parsedargs);
+    return;
 }
 
 /* Start of code by Michael Albert */
