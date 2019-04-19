@@ -14,6 +14,5 @@
 
  int expand (char *orig, char *new, int newsize);
  int isbuiltin (char **parsedargs, int argc);
- void execbuiltin (char **parsedargs, int argc);
 
 #endif
