@@ -23,7 +23,7 @@ int expand (char *orig, char *new, int newsize) {
   ix = 0;
   jx = 0;
   while (orig[ix] != 0) {
-    /* Replace text with env */ //Note: Make this a helper function to easily add other expansions.
+    /* Replace text with something else */
     if (orig[ix] == '$') {
       int processed = specprocess (orig, new, newsize, &ix, &jx);
       /* Make sure specprocess ran correctly */
@@ -76,6 +76,7 @@ int specprocess (char *orig, char *new, int newsize, int *ix, int *jx) {
     }
   }
 
+  /* Print out pid from $$ */
   else if (orig[*ix+1] == '$') {
     *ix = *ix + 2;
     char buffer[10];
@@ -88,5 +89,13 @@ int specprocess (char *orig, char *new, int newsize, int *ix, int *jx) {
       kx++;
     }
   }
+
+  /* No special character after first $, do nothing */
+  else {
+    new[*jx] = orig[*ix];
+    (*jx)++;
+    (*ix)++;
+  }
+
   return 0;
 }
