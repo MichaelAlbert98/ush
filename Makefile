@@ -3,12 +3,11 @@
 CC = gcc
 CFLAGS = -g -Wall
 objects = ush.o expand.o builtin.o
-depends = ush.c expand.c builtin.c
 
 ush: $(objects)
-	$(CC) $(CFLAGS) -o ush $(objects)
+	$(CC) $(CFLAGS) -o $@ $(objects)
 
-depends: defn.h
+ush.o expand.o builtin.o: defn.h
 
 clean:
 	rm -f ush $(objects)
