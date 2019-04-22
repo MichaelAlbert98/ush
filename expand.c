@@ -34,6 +34,11 @@ int expand (char *orig, char *new, int newsize) {
 
     /* Copy over char */
     else {
+      /* Make sure no buffer overflow */
+      if (jx == newsize) {
+        fprintf(stderr, "Expansion overflow.\n");
+        return -1;
+      }
       new[jx] = orig[ix];
       jx++;
       ix++;
@@ -69,6 +74,11 @@ int specprocess (char *orig, char *new, int newsize, int *ix, int *jx) {
     if (env != NULL) {
       kx = 0;
       while (env[kx] != 0) {
+        /* Make sure no buffer overflow */
+        if (*jx == newsize) {
+          fprintf(stderr, "Expansion overflow.\n");
+          return -1;
+        }
         new[*jx] = env[kx];
         (*jx)++;
         kx++;
@@ -84,6 +94,11 @@ int specprocess (char *orig, char *new, int newsize, int *ix, int *jx) {
     kx = 0;
     /* Add pid to new */
     while (buffer[kx] != 0) {
+      /* Make sure no buffer overflow */
+      if (*jx == newsize) {
+        fprintf(stderr, "Expansion overflow.\n");
+        return -1;
+      }
       new[*jx] = buffer[kx];
       (*jx)++;
       kx++;
@@ -92,6 +107,11 @@ int specprocess (char *orig, char *new, int newsize, int *ix, int *jx) {
 
   /* No special character after first $, do nothing */
   else {
+    /* Make sure no buffer overflow */
+    if (*jx == newsize) {
+      fprintf(stderr, "Expansion overflow.\n");
+      return -1;
+    }
     new[*jx] = orig[*ix];
     (*jx)++;
     (*ix)++;
