@@ -86,11 +86,15 @@ void cdbuilt (char **parsedargs, int argc) {
   }
   /* Change directory to given path */
   else if (argc == 2){
-    chdir(parsedargs[1]);
+    if (chdir(parsedargs[1]) != 0) {
+      fprintf(stderr, "Could not cd to the given directory.\n");
+    }
   }
   /* Default go home */
   else {
-    chdir(getenv("HOME"));
+    if (chdir(getenv("HOME")) != 0) {
+      fprintf(stderr, "Could not cd to the given directory.\n");
+    }
   }
   return;
 }
