@@ -1,7 +1,7 @@
 /*   CS 347 -- Expand
  *
  *   April 14, 2019, Michael Albert
- *   Modified April 16, 2019
+ *   Modified April 22, 2019
  *
  */
 
@@ -36,7 +36,7 @@ int expand (char *orig, char *new, int newsize) {
     else {
       /* Make sure no buffer overflow */
       if (jx == newsize) {
-        fprintf(stderr, "Expansion overflow.\n");
+        fprintf(stderr, "Expansion too long.\n");
         return -1;
       }
       new[jx] = orig[ix];
@@ -60,7 +60,7 @@ int specprocess (char *orig, char *new, int newsize, int *ix, int *jx) {
     while (orig[*ix] != '}') {
       /* Return if no closing brace */
       if (orig[*ix] == 0) {
-        printf("Mismatched braces.\n");
+        printf("No matching } found.\n");
         return -1;
       }
       (*ix)++;
