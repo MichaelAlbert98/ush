@@ -1,7 +1,7 @@
 /*   CS 347 -- Builtin
  *
  *   April 16, 2019, Michael Albert
- *   Modified April 17, 2019
+ *   Modified April 22, 2019
  *
  */
 
@@ -87,13 +87,13 @@ void cdbuilt (char **parsedargs, int argc) {
   /* Change directory to given path */
   else if (argc == 2){
     if (chdir(parsedargs[1]) != 0) {
-      fprintf(stderr, "Could not cd to the given directory.\n");
+      fprintf(stderr, "No such file or directory.\n");
     }
   }
   /* Default go home */
   else {
     if (chdir(getenv("HOME")) != 0) {
-      fprintf(stderr, "Could not cd to the given directory.\n");
+      fprintf(stderr, "Home not set.\n");
     }
   }
   return;
