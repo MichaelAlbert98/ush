@@ -6,7 +6,7 @@
  *   Modified January 8, 2017
  *
  *   April 03, 2019, Michael Albert
- *   Modified April 16, 2019
+ *   Modified April 22, 2019
  *
  */
 
@@ -67,6 +67,7 @@ void processline (char *line)
     int    argc;
     char   newline [LINELEN];
 
+    /* Start of code by Michael Albert */
     /* Expand line and check if error */
     int expanded = expand(line, newline, LINELEN);
 
@@ -92,6 +93,7 @@ void processline (char *line)
     if (isbuiltin(parsedargs, argc) == 1) {
       return;
     }
+    /* End of code by Michael Albert */
 
     /* Otherwise fork the process */
     else {
