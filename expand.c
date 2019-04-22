@@ -76,7 +76,7 @@ int specprocess (char *orig, char *new, int newsize, int *ix, int *jx) {
       while (env[kx] != 0) {
         /* Make sure no buffer overflow */
         if (*jx == newsize) {
-          fprintf(stderr, "Expansion overflow.\n");
+          fprintf(stderr, "Expansion too long.\n");
           return -1;
         }
         new[*jx] = env[kx];
@@ -96,7 +96,7 @@ int specprocess (char *orig, char *new, int newsize, int *ix, int *jx) {
     while (buffer[kx] != 0) {
       /* Make sure no buffer overflow */
       if (*jx == newsize) {
-        fprintf(stderr, "Expansion overflow.\n");
+        fprintf(stderr, "Expansion too long.\n");
         return -1;
       }
       new[*jx] = buffer[kx];
@@ -109,7 +109,7 @@ int specprocess (char *orig, char *new, int newsize, int *ix, int *jx) {
   else {
     /* Make sure no buffer overflow */
     if (*jx == newsize) {
-      fprintf(stderr, "Expansion overflow.\n");
+      fprintf(stderr, "Expansion too long.\n");
       return -1;
     }
     new[*jx] = orig[*ix];
