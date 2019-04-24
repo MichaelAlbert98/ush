@@ -35,7 +35,7 @@ int
 main (void)
 {
     char   buffer [LINELEN];
-    int    len;
+    int    ix;
 
     while (1) {
 
@@ -44,10 +44,12 @@ main (void)
 	if (fgets (buffer, LINELEN, stdin) != buffer)
 	  break;
 
-        /* Get rid of \n at end of buffer. */
-	len = strlen(buffer);
-	if (buffer[len-1] == '\n')
-	    buffer[len-1] = 0;
+  /* Get rid of \n at end of buffer or comments. */
+  ix = 0;
+  while (buffer[ix] != '\n' && (buffer[ix] != '$' && buffer[ix+1] != '#')) {
+    ix++;
+  }
+  buffer[ix] = 0;
 
 	/* Run it ... */
 	processline (buffer);
