@@ -46,7 +46,11 @@ main (void)
 
   /* Get rid of \n at end of buffer or comments. */
   ix = 0;
-  while (buffer[ix] != '\n' && (buffer[ix] != '$' && buffer[ix+1] != '#')) {
+  while (buffer[ix] != '\n' && buffer[ix] != '#') {
+    /* Keep $# if found */
+    if (buffer[ix] == '$' && buffer[ix+1] == '#') {
+      ix++;
+    }
     ix++;
   }
   buffer[ix] = 0;
