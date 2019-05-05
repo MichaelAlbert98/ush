@@ -1,7 +1,7 @@
 /*   CS 347 -- Builtin
  *
  *   April 16, 2019, Michael Albert
- *   Modified April 22, 2019
+ *   Modified May 05, 2019
  *
  */
 
@@ -14,7 +14,7 @@
 /* Constants */
 
 #define BUILTINNUM 4
-const char* builtins[] = { "exit", "envset", "envunset", "cd"};
+const char* builtins[] = { "exit", "envset", "envunset", "cd", "sstat"};
 
 /* Prototypes */
 
@@ -22,6 +22,7 @@ void exitbuilt (char **parsedargs, int argc);
 void envsetbuilt (char **parsedargs, int argc);
 void envunsetbuilt (char **parsedargs, int argc);
 void cdbuilt (char **parsedargs, int argc);
+void sstat (char **parsedargs, int argc);
 
 /* Builtin */
 
@@ -30,7 +31,8 @@ int isbuiltin (char **parsedargs, int argc) {
   for (int i = 0; i < BUILTINNUM; i++) {
     if (strcmp(parsedargs[0], builtins[i]) == 0) {
       /* Call corresponding builtin helper */
-      void (*funcptrarr[])(char**, int) = {exitbuilt, envsetbuilt, envunsetbuilt, cdbuilt};
+      void (*funcptrarr[])(char**, int) = {exitbuilt, envsetbuilt, envunsetbuilt,
+            cdbuilt,sstat};
       (*funcptrarr[i])(parsedargs, argc);
       return 1;
     }
@@ -95,6 +97,19 @@ void cdbuilt (char **parsedargs, int argc) {
     if (chdir(getenv("HOME")) != 0) {
       fprintf(stderr, "Home not set.\n");
     }
+  }
+  return;
+}
+
+void sstat (char **parsedargs, int argc) {
+  /* Print error */
+  if (argc < 2) {
+    fprintf(stderr, "Incorrect number of arguments.\n");
+  }
+  /* Loops through and get info about each file */
+  for (int i = 0; i < argc; i++) {
+    /* placeholder */
+    int j = 0;
   }
   return;
 }
