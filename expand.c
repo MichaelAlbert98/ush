@@ -10,12 +10,15 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <string.h>
+#include <ctype.h>
 #include "defn.h"
+#include "globals.h"
 
 /* Prototypes */
 
 int specprocess (char *orig, char *new, int newsize);
 int wildcard (char *orig, char *new, int newsize);
+int checkdigits (char *orig);
 
 /* Global Variables */
 int ix = 0;
@@ -67,6 +70,7 @@ int specprocess (char *orig, char *new, int newsize) {
   char *env; //string from getenv
   int temp; //placeholder
   int kx; //iterator
+  int value = checkdigits(orig); //val of digits after $
 
   if (orig[ix+1] == '{') {
     temp = ix+2;
@@ -116,6 +120,45 @@ int specprocess (char *orig, char *new, int newsize) {
       new[jx] = buffer[kx];
       jx++;
       kx++;
+    }
+  }
+
+  /* Replace $n with command line arg n+1 */
+  else if (value != -1) {
+    char *name;
+    int kx = 0;
+    /* No arguments given */
+    if (globalargc == 1) {
+      /* Replace with shell name */
+      if (value == 0) {
+        name = globalargv[0];
+        /* Copy over shell name */
+        while (name[kx] != 0) {
+          /* Make sure no buffer overflow */
+          if (jx == newsize) {
+            fprintf(stderr, "Expansion too long.\n");
+            return -1;
+          }
+          new[jx] = name[kx];
+          jx++;
+          kx++;
+        }
+      }
+    }
+    /* Only replace if $n isn't too large */
+    else if (globalargc > value + 1) {
+      char *name = globalargv[value+1];
+      /* Copy over arg name */
+      while (name[kx] != 0) {
+        /* Make sure no buffer overflow */
+        if (jx == newsize) {
+          fprintf(stderr, "Expansion too long.\n");
+          return -1;
+        }
+        new[jx] = name[kx];
+        jx++;
+        kx++;
+      }
     }
   }
 
@@ -278,4 +321,27 @@ int wildcard (char *orig, char *new, int newsize) {
     closedir(workingdirec);
   }
   return 0;
+}
+
+int checkdigits(char *orig) {
+  /* Check if first char is digit */
+  ix++;
+  if (isdigit(orig[ix]) == 0) {
+    return -1;
+  }
+  int temp = ix;
+  /* Loop until non-digit is reached */
+  while (isdigit(orig[ix]) != 0) {
+    ix++;
+  }
+  /* Replace orig[ix] with 0 temporarily */
+  if (orig[ix] != 0) {
+    char tempc = orig[ix];
+    orig[ix] = 0;
+    temp = atoi(&orig[temp]);
+    orig[ix] = tempc;
+    return temp;
+  }
+  /* orig[ix] already 0, do nothing */
+  return atoi(&orig[temp]);
 }
