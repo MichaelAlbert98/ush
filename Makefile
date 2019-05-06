@@ -7,7 +7,7 @@ objects = ush.o expand.o builtin.o
 ush: $(objects)
 	$(CC) $(CFLAGS) -o $@ $(objects)
 
-ush.o expand.o builtin.o: defn.h
+ush.o expand.o builtin.o: defn.h globals.h
 
 clean:
 	rm -f ush $(objects)

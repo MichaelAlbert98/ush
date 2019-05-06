@@ -45,7 +45,7 @@ int main (int mainargc, char **mainargv) {
 
   if (mainargc > 1) {
     if ((input = fopen(mainargv[1],"r")) == NULL) {
-      perror ("fopen");
+      perror ("open");
       exit(127);
     }
   }
@@ -109,7 +109,6 @@ void processline (char *line)
 
     /* Return if no args */
     if (argc == 0) {
-      fprintf(stderr, "No arguments.\n");
       return;
     }
 

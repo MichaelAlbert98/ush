@@ -150,8 +150,7 @@ void sstat (char **parsedargs, int argc) {
   }
   /* Loops through and get info about each file */
   for (int i = 0; i < argc; i++) {
-    /* placeholder */
-    int j = 0;
+
   }
   return;
 }

@@ -5,7 +5,7 @@
  *
  */
 
- #pragma once
+#pragma once
 
 /* Global Vars */
 extern int globalargc;
