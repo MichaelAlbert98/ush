@@ -22,6 +22,7 @@
 
 int globalargc;
 char **globalargv;
+int shifted = 0;
 
 /* Constants */
 
