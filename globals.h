@@ -8,5 +8,6 @@
  #pragma once
 
 /* Global Vars */
-extern int globalargc;  
-extern char **globalargv;  
+extern int globalargc;
+extern char **globalargv;
+extern int shifted;
