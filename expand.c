@@ -166,7 +166,7 @@ int specprocess (char *orig, char *new, int newsize) {
   else if (orig[ix+1] == '#') {
     ix = ix + 2;
     char buffer[6];
-    snprintf(buffer, 6, "%d", globalargc-1);
+    snprintf(buffer, 6, "%d", globalargc-1-shifted);
     kx = 0;
     /* Add num of args to new */
     while (buffer[kx] != 0) {
@@ -353,14 +353,23 @@ int checkdigits(char *orig) {
   while (isdigit(orig[ix]) != 0) {
     ix++;
   }
-  /* Replace orig[ix] with 0 temporarily */
-  if (orig[ix] != 0) {
-    char tempc = orig[ix];
-    orig[ix] = 0;
-    temp = atoi(&orig[temp]);
-    orig[ix] = tempc;
-    return temp;
-  }
   /* orig[ix] already 0, do nothing */
-  return atoi(&orig[temp]);
+  if (orig[ix] == 0) {
+    /* Make sure shift does not affect $0 */
+    if ((temp = atoi(&orig[temp])) == 0) {
+      return 0;
+    }
+    return temp+shifted;
+  }
+  /* Replace orig[ix] with 0 temporarily */
+  char tempc = orig[ix];
+  orig[ix] = 0;
+  /* Make sure shift does not affect $0 */
+  if ((temp = atoi(&orig[temp])) == 0) {
+    orig[ix] = tempc;
+    return 0;
+  }
+  temp = temp+shifted;
+  orig[ix] = tempc;
+  return temp;
 }
