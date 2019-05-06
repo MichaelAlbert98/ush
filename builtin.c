@@ -10,11 +10,13 @@
 #include <unistd.h>
 #include <string.h>
 #include "defn.h"
+#include "globals.h"
 
 /* Constants */
 
-#define BUILTINNUM 4
-const char* builtins[] = { "exit", "envset", "envunset", "cd", "sstat"};
+#define BUILTINNUM 7
+const char* builtins[] = { "exit", "envset", "envunset", "cd", "shift",
+                          "unshift", "sstat"};
 
 /* Prototypes */
 
@@ -22,6 +24,8 @@ void exitbuilt (char **parsedargs, int argc);
 void envsetbuilt (char **parsedargs, int argc);
 void envunsetbuilt (char **parsedargs, int argc);
 void cdbuilt (char **parsedargs, int argc);
+void shift (char **parsedargs, int argc);
+void unshift (char **parsedargs, int argc);
 void sstat (char **parsedargs, int argc);
 
 /* Builtin */
@@ -32,7 +36,7 @@ int isbuiltin (char **parsedargs, int argc) {
     if (strcmp(parsedargs[0], builtins[i]) == 0) {
       /* Call corresponding builtin helper */
       void (*funcptrarr[])(char**, int) = {exitbuilt, envsetbuilt, envunsetbuilt,
-            cdbuilt,sstat};
+            cdbuilt, shift, unshift, sstat};
       (*funcptrarr[i])(parsedargs, argc);
       return 1;
     }
@@ -99,6 +103,44 @@ void cdbuilt (char **parsedargs, int argc) {
     }
   }
   return;
+}
+
+void shift (char **parsedargs, int argc) {
+  /* Print error */
+  if (argc > 2) {
+    fprintf(stderr, "Incorrect number of arguments.\n");
+  }
+  /* Shift by n if possible */
+  else if (argc == 2 && shifted + atoi(parsedargs[1]) < globalargc - 1) {
+    shifted = shifted + atoi(parsedargs[1]);
+  }
+  /* Shift by 1 if possible */
+  else if (argc == 1 && shifted + 1 < globalargc - 1) {
+    shifted = shifted + 1;
+  }
+  /* Shift too large */
+  else {
+    fprintf(stderr, "Shift value too large\n");
+  }
+}
+
+void unshift (char **parsedargs, int argc) {
+  /* Print error */
+  if (argc > 2) {
+    fprintf(stderr, "Incorrect number of arguments.\n");
+  }
+  /* Unshift by n if possible */
+  else if (argc == 2 && atoi(parsedargs[1]) <= shifted) {
+    shifted = shifted - atoi(parsedargs[1]);
+  }
+  /* Unshift entirely if possible */
+  else if (argc == 1) {
+    shifted = 0;
+  }
+  /* Unshift too large */
+  else {
+    fprintf(stderr, "Unshift value too large\n");
+  }
 }
 
 void sstat (char **parsedargs, int argc) {
