@@ -72,7 +72,46 @@ int specprocess (char *orig, char *new, int newsize) {
   int kx; //iterator
   int value = checkdigits(orig); //val of digits after $
 
-  if (orig[ix+1] == '{') {
+  /* Replace $n with command line arg n+1 */
+  if (value != -1) {
+    char *name;
+    int kx = 0;
+    /* No arguments given */
+    if (globalargc == 1) {
+      /* Replace with shell name */
+      if (value == 0) {
+        name = globalargv[0];
+        /* Copy over shell name */
+        while (name[kx] != 0) {
+          /* Make sure no buffer overflow */
+          if (jx == newsize) {
+            fprintf(stderr, "Expansion too long.\n");
+            return -1;
+          }
+          new[jx] = name[kx];
+          jx++;
+          kx++;
+        }
+      }
+    }
+    /* Only replace if $n isn't too large */
+    else if (globalargc > value + 1) {
+      char *name = globalargv[value+1];
+      /* Copy over arg name */
+      while (name[kx] != 0) {
+        /* Make sure no buffer overflow */
+        if (jx == newsize) {
+          fprintf(stderr, "Expansion too long.\n");
+          return -1;
+        }
+        new[jx] = name[kx];
+        jx++;
+        kx++;
+      }
+    }
+  }
+
+  else if (orig[ix+1] == '{') {
     temp = ix+2;
     /* Loop until '}' found */
     while (orig[ix] != '}') {
@@ -123,42 +162,22 @@ int specprocess (char *orig, char *new, int newsize) {
     }
   }
 
-  /* Replace $n with command line arg n+1 */
-  else if (value != -1) {
-    char *name;
-    int kx = 0;
-    /* No arguments given */
-    if (globalargc == 1) {
-      /* Replace with shell name */
-      if (value == 0) {
-        name = globalargv[0];
-        /* Copy over shell name */
-        while (name[kx] != 0) {
-          /* Make sure no buffer overflow */
-          if (jx == newsize) {
-            fprintf(stderr, "Expansion too long.\n");
-            return -1;
-          }
-          new[jx] = name[kx];
-          jx++;
-          kx++;
-        }
+  /* Replace $# with num of args */
+  else if (orig[ix+1] == '#') {
+    ix = ix + 2;
+    char buffer[6];
+    snprintf(buffer, 6, "%d", globalargc-1);
+    kx = 0;
+    /* Add num of args to new */
+    while (buffer[kx] != 0) {
+      /* Make sure no buffer overflow */
+      if (jx == newsize) {
+        fprintf(stderr, "Expansion too long.\n");
+        return -1;
       }
-    }
-    /* Only replace if $n isn't too large */
-    else if (globalargc > value + 1) {
-      char *name = globalargv[value+1];
-      /* Copy over arg name */
-      while (name[kx] != 0) {
-        /* Make sure no buffer overflow */
-        if (jx == newsize) {
-          fprintf(stderr, "Expansion too long.\n");
-          return -1;
-        }
-        new[jx] = name[kx];
-        jx++;
-        kx++;
-      }
+      new[jx] = buffer[kx];
+      jx++;
+      kx++;
     }
   }
 
@@ -325,10 +344,10 @@ int wildcard (char *orig, char *new, int newsize) {
 
 int checkdigits(char *orig) {
   /* Check if first char is digit */
-  ix++;
-  if (isdigit(orig[ix]) == 0) {
+  if (isdigit(orig[ix+1]) == 0) {
     return -1;
   }
+  ix++;
   int temp = ix;
   /* Loop until non-digit is reached */
   while (isdigit(orig[ix]) != 0) {
