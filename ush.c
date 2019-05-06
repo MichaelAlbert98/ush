@@ -18,6 +18,10 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include "defn.h"
+#include "globals.h"
+
+int globalargc;
+char **globalargv;
 
 /* Constants */
 
@@ -31,36 +35,49 @@ void removequotes(char *line);
 
 /* Shell main */
 
-int
-main (void)
-{
-    char   buffer [LINELEN];
-    int    ix;
+int main (int mainargc, char **mainargv) {
+  globalargc = mainargc;
+  globalargv = mainargv;
+  char   buffer [LINELEN];
+  FILE   *input;
+  int    ix;
 
-    while (1) {
+  if (mainargc > 1) {
+    if ((input = fopen(mainargv[1],"r")) == NULL) {
+      perror ("fopen");
+      exit(127);
+    }
+  }
+  else {
+    input = stdin;
+  }
 
-        /* prompt and get line */
-	fprintf (stderr, "%% ");
-	if (fgets (buffer, LINELEN, stdin) != buffer)
-	  break;
+  while (1) {
 
-  /* Get rid of \n at end of buffer or comments. */
-  ix = 0;
-  while (buffer[ix] != '\n' && buffer[ix] != '#') {
-    /* Keep $# if found */
-    if (buffer[ix] == '$' && buffer[ix+1] == '#') {
+    /* prompt and get line */
+    if (input == stdin) {
+    	fprintf (stderr, "%% ");
+    }
+  	if (fgets (buffer, LINELEN, input) != buffer)
+  	  break;
+
+    /* Get rid of \n at end of buffer or comments. */
+    ix = 0;
+    while (buffer[ix] != '\n' && buffer[ix] != '#') {
+      /* Keep $# if found */
+      if (buffer[ix] == '$' && buffer[ix+1] == '#') {
+        ix++;
+      }
       ix++;
     }
-    ix++;
+    buffer[ix] = 0;
+
+  	/* Run it ... */
+  	processline (buffer);
+
   }
-  buffer[ix] = 0;
 
-	/* Run it ... */
-	processline (buffer);
-
-    }
-
-    if (!feof(stdin))
+    if (!feof(input))
         perror ("read");
 
     return 0;		/* Also known as exit (0); */
