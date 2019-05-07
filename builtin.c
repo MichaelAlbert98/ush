@@ -9,6 +9,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <grp.h>
+#include <pwd.h>
+#include <time.h>
 #include "defn.h"
 #include "globals.h"
 
@@ -27,6 +32,7 @@ void cdbuilt (char **parsedargs, int argc);
 void shift (char **parsedargs, int argc);
 void unshift (char **parsedargs, int argc);
 void sstat (char **parsedargs, int argc);
+void strmode (mode_t mode, char *p);
 
 /* Builtin */
 
@@ -149,8 +155,33 @@ void sstat (char **parsedargs, int argc) {
     fprintf(stderr, "Incorrect number of arguments.\n");
   }
   /* Loops through and get info about each file */
-  for (int i = 0; i < argc; i++) {
-
+  for (int i = 1; i < argc; i++) {
+    struct stat sbuf;
+    if (stat(parsedargs[i], &sbuf) == 0) {
+      /* File name */
+      printf("%s ", parsedargs[i]);
+      /* User name */
+      struct passwd *uname = getpwuid(sbuf.st_uid);
+      printf("%s ", uname->pw_name);
+      /* Group name */
+      struct group *gname = getgrgid(sbuf.st_gid);
+      printf("%s ", gname->gr_name);
+      /* Permission list */
+      char str[11];
+      strmode(sbuf.st_mode, str);
+      printf("%s", str);
+      /* Num links */
+      printf("%li ", sbuf.st_nlink);
+      /* File size (bytes) */
+      printf("%li ", sbuf.st_size);
+      /* Modification time */
+      time_t sec = sbuf.st_mtim.tv_sec;
+      printf("%s", asctime(localtime(&sec)));
+    }
+    /* Could not open file */
+    else {
+      perror ("open");
+    }
   }
   return;
 }
