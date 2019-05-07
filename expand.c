@@ -171,19 +171,21 @@ int specprocess (char *orig, char *new, int newsize) {
       jx++;
     }
     /* Otherwise get globalargs - 1 - shift value */
-    char buffer[6];
-    snprintf(buffer, 6, "%d", globalargc-1-shifted);
-    kx = 0;
-    /* Add num of args to new */
-    while (buffer[kx] != 0) {
-      /* Make sure no buffer overflow */
-      if (jx == newsize) {
-        fprintf(stderr, "Expansion too long.\n");
-        return -1;
+    else {
+      char buffer[6];
+      snprintf(buffer, 6, "%d", globalargc-1-shifted);
+      kx = 0;
+      /* Add num of args to new */
+      while (buffer[kx] != 0) {
+        /* Make sure no buffer overflow */
+        if (jx == newsize) {
+          fprintf(stderr, "Expansion too long.\n");
+          return -1;
+        }
+        new[jx] = buffer[kx];
+        jx++;
+        kx++;
       }
-      new[jx] = buffer[kx];
-      jx++;
-      kx++;
     }
   }
 
