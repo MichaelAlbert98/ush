@@ -168,7 +168,7 @@ char** arg_parse (char *line, int *argcptr)
         ix++;
       }
       /* Add argument */
-      if (line[ix] != ' ') {
+      if (line[ix] != ' ' && line[ix] != 0) {
         argc++;
         /* Loop to end of arg */
         while (line[ix] != ' ' && line[ix] != 0) {
