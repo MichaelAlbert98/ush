@@ -165,6 +165,12 @@ int specprocess (char *orig, char *new, int newsize) {
   /* Replace $# with num of args */
   else if (orig[ix+1] == '#') {
     ix = ix + 2;
+    /* Should print 1 if it is ./ush */
+    if (globalargc == 1) {
+      new[jx] = '1';
+      jx++;
+    }
+    /* Otherwise get globalargs - 1 - shift value */
     char buffer[6];
     snprintf(buffer, 6, "%d", globalargc-1-shifted);
     kx = 0;
