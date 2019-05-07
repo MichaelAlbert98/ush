@@ -160,34 +160,34 @@ void sstat (char **parsedargs, int argc) {
       struct stat sbuf;
       if (stat(parsedargs[i], &sbuf) == 0) {
         /* File name */
-        printf("%s ", parsedargs[i]);
+        fprintf("%s ", parsedargs[i]);
         /* User name */
         struct passwd *uname = getpwuid(sbuf.st_uid);
         if (uname == NULL) {
-          printf("%d ", sbuf.st_uid);
+          fprintf("%d ", sbuf.st_uid);
         }
         else {
-          printf("%s ", uname->pw_name);
+          fprintf("%s ", uname->pw_name);
         }
         /* Group name */
         struct group *gname = getgrgid(sbuf.st_gid);
         if (gname == NULL) {
-          printf("%d ", sbuf.st_gid);
+          fprintf("%d ", sbuf.st_gid);
         }
         else {
-          printf("%s ", gname->gr_name);
+          fprintf("%s ", gname->gr_name);
         }
         /* Permission list */
         char str[11];
         strmode(sbuf.st_mode, str);
-        printf("%s", str);
+        fprintf("%s", str);
         /* Num links */
-        printf("%li ", sbuf.st_nlink);
+        fprintf("%li ", sbuf.st_nlink);
         /* File size (bytes) */
-        printf("%li ", sbuf.st_size);
+        fprintf("%li ", sbuf.st_size);
         /* Modification time */
         time_t sec = sbuf.st_mtim.tv_sec;
-        printf("%s", asctime(localtime(&sec)));
+        fprintf("%s", asctime(localtime(&sec)));
       }
       /* Could not open file */
       else {
