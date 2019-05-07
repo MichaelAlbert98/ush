@@ -187,7 +187,8 @@ void sstat (char **parsedargs, int argc) {
         printf("%li ", sbuf.st_size);
         /* Modification time */
         time_t sec = sbuf.st_mtim.tv_sec;
-        printf("%s\n", asctime(localtime(&sec)));
+        printf("%s", asctime(localtime(&sec)));
+        fflush(stdout);
       }
       /* Could not open file */
       else {
