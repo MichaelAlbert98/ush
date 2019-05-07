@@ -1,7 +1,7 @@
 /*   CS 347 -- Expand
  *
  *   April 14, 2019, Michael Albert
- *   Modified May 05, 2019
+ *   Modified May 06, 2019
  *
  */
 
@@ -335,6 +335,7 @@ int wildcard (char *orig, char *new, int newsize) {
     }
     /* If no file names added, add pattern to new */
     if (found == jx) {
+      temp--;
       while (orig[temp] != 0 && orig[temp] != ' ') {
         new[jx] = orig[temp];
         jx++;
