@@ -19,6 +19,7 @@
 int specprocess (char *orig, char *new, int newsize);
 int wildcard (char *orig, char *new, int newsize);
 int checkdigits (char *orig);
+int copychars (char *new, char *copy, int newsize);
 
 /* Global Variables */
 int ix = 0;
@@ -69,44 +70,25 @@ int expand (char *orig, char *new, int newsize) {
 int specprocess (char *orig, char *new, int newsize) {
   char *env; //string from getenv
   int temp; //placeholder
-  int kx; //iterator
   int value = checkdigits(orig); //val of digits after $
 
   /* Replace $n with command line arg n+1 */
   if (value != -1) {
-    char *name;
-    int kx = 0;
     /* No arguments given */
     if (globalargc == 1) {
       /* Replace with shell name */
       if (value == 0) {
-        name = globalargv[0];
-        /* Copy over shell name */
-        while (name[kx] != 0) {
-          /* Make sure no buffer overflow */
-          if (jx == newsize) {
-            fprintf(stderr, "Expansion too long.\n");
-            return -1;
-          }
-          new[jx] = name[kx];
-          jx++;
-          kx++;
+        char *copy = globalargv[0];
+        if (copychars(new, copy, newsize) == -1) {
+          return -1;
         }
       }
     }
     /* Only replace if $n isn't too large */
     else if (globalargc > value + 1) {
-      char *name = globalargv[value+1];
-      /* Copy over arg name */
-      while (name[kx] != 0) {
-        /* Make sure no buffer overflow */
-        if (jx == newsize) {
-          fprintf(stderr, "Expansion too long.\n");
-          return -1;
-        }
-        new[jx] = name[kx];
-        jx++;
-        kx++;
+      char *copy = globalargv[value+1];
+      if (copychars(new, copy, newsize) == -1) {
+        return -1;
       }
     }
   }
@@ -129,16 +111,8 @@ int specprocess (char *orig, char *new, int newsize) {
     ix++;
     /* Add env to new if it exists */
     if (env != NULL) {
-      kx = 0;
-      while (env[kx] != 0) {
-        /* Make sure no buffer overflow */
-        if (jx == newsize) {
-          fprintf(stderr, "Expansion too long.\n");
-          return -1;
-        }
-        new[jx] = env[kx];
-        jx++;
-        kx++;
+      if (copychars(new, env, newsize) == -1) {
+        return -1;
       }
     }
   }
@@ -148,17 +122,9 @@ int specprocess (char *orig, char *new, int newsize) {
     ix = ix + 2;
     char buffer[10];
     snprintf(buffer, 10, "%d", getpid());
-    kx = 0;
     /* Add pid to new */
-    while (buffer[kx] != 0) {
-      /* Make sure no buffer overflow */
-      if (jx == newsize) {
-        fprintf(stderr, "Expansion too long.\n");
-        return -1;
-      }
-      new[jx] = buffer[kx];
-      jx++;
-      kx++;
+    if (copychars(new, buffer, newsize) == -1) {
+      return -1;
     }
   }
 
@@ -174,22 +140,14 @@ int specprocess (char *orig, char *new, int newsize) {
     else {
       char buffer[6];
       snprintf(buffer, 6, "%d", globalargc-1-shifted);
-      kx = 0;
       /* Add num of args to new */
-      while (buffer[kx] != 0) {
-        /* Make sure no buffer overflow */
-        if (jx == newsize) {
-          fprintf(stderr, "Expansion too long.\n");
-          return -1;
-        }
-        new[jx] = buffer[kx];
-        jx++;
-        kx++;
+      if (copychars(new, buffer, newsize) == -1) {
+        return -1;
       }
     }
   }
 
-  /* No special character after first $, do nothing */
+  /* No special character after first $, copy over one char */
   else {
     /* Make sure no buffer overflow */
     if (jx == newsize) {
@@ -205,7 +163,6 @@ int specprocess (char *orig, char *new, int newsize) {
 }
 
 int wildcard (char *orig, char *new, int newsize) {
-  int kx; //iterator
   int temp; //placeholder
   int changed; //tells if temp changed value
 
@@ -246,25 +203,13 @@ int wildcard (char *orig, char *new, int newsize) {
         char *name = entry->d_name;
         /* Add to new if it doesn't start with '.' */
         if (name[0] != '.') {
-          kx = 0;
-          while (name[kx] != 0) {
-            /* Make sure no buffer overflow */
-            if (jx == newsize) {
-              fprintf(stderr, "Expansion too long.\n");
-              return -1;
-            }
-            new[jx] = name[kx];
-            jx++;
-            kx++;
-          }
-          /* Make sure no buffer overflow */
-          if (jx == newsize) {
-            fprintf(stderr, "Expansion too long.\n");
+          if (copychars(new, name, newsize) == -1) {
             return -1;
           }
-          /* Add space between entries */
-          new[jx] = ' ';
-          jx++;
+          /* Add space between names */
+          if (copychars(new, " ", newsize) == -1) {
+            return -1;
+          }
         }
     }
     /* Remove trailing space */
@@ -307,25 +252,13 @@ int wildcard (char *orig, char *new, int newsize) {
         if (namelen >= len) {
           char *lastlen = &name[namelen-len];
           if (name[0] != '.' && strcmp(&orig[temp],lastlen) == 0) {
-            kx = 0;
-            while (name[kx] != 0) {
-              /* Make sure no buffer overflow */
-              if (jx == newsize) {
-                fprintf(stderr, "Expansion too long.\n");
-                return -1;
-              }
-              new[jx] = name[kx];
-              jx++;
-              kx++;
-            }
-            /* Make sure no buffer overflow */
-            if (jx == newsize) {
-              fprintf(stderr, "Expansion too long.\n");
+            if (copychars(new, name, newsize) == -1) {
               return -1;
             }
             /* Add space between entries */
-            new[jx] = ' ';
-            jx++;
+            if (copychars(new, " ", newsize) == -1) {
+              return -1;
+            }
           }
         }
     }
@@ -381,4 +314,20 @@ int checkdigits(char *orig) {
   temp = temp+shifted;
   orig[ix] = tempc;
   return temp;
+}
+
+int copychars (char *new, char *copy, int newsize) {
+  int kx = 0;
+  while (copy[kx] != 0) {
+    /* Make sure no buffer overflow */
+    if (jx == newsize) {
+      fprintf(stderr, "Expansion too long.\n");
+      return -1;
+    }
+    /* Copy string to new line */
+    new[jx] = copy[kx];
+    jx++;
+    kx++;
+  }
+  return 0;
 }
