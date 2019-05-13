@@ -1,7 +1,7 @@
 /*   CS 347 -- Builtin
  *
  *   April 16, 2019, Michael Albert
- *   Modified May 06, 2019
+ *   Modified May 11, 2019
  *
  */
 
@@ -71,10 +71,12 @@ void envsetbuilt (char **parsedargs, int argc) {
   /* Print error */
   if (argc != 3) {
     fprintf(stderr, "Incorrect number of arguments.\n");
+    dollarques = 1;
   }
   /* Set the given environment. No overwriting */
   else {
     setenv(parsedargs[1],parsedargs[2],0);
+    dollarques = 0;
   }
   return;
 }
@@ -83,35 +85,42 @@ void envunsetbuilt (char **parsedargs, int argc) {
   /* Print error */
   if (argc != 2) {
     fprintf(stderr, "Incorrect number of arguments.\n");
+    dollarques = 1;
   }
   /* Remove environment with given name */
   else {
     unsetenv(parsedargs[1]);
+    dollarques = 0;
   }
   return;
 }
 
 void cdbuilt (char **parsedargs, int argc) {
   /* Print error */
+  dollarques = 0;
   if (argc > 2) {
     fprintf(stderr, "Incorrect number of arguments.\n");
+    dollarques = 1;
   }
   /* Change directory to given path */
   else if (argc == 2){
     if (chdir(parsedargs[1]) != 0) {
       fprintf(stderr, "No such file or directory.\n");
+      dollarques = 1;
     }
   }
   /* Default go home */
   else {
     if (chdir(getenv("HOME")) != 0) {
       fprintf(stderr, "Home not set.\n");
+      dollarques = 1;
     }
   }
   return;
 }
 
 void shift (char **parsedargs, int argc) {
+  dollarques = 1;
   /* Print error */
   if (argc > 2) {
     fprintf(stderr, "Incorrect number of arguments.\n");
@@ -119,18 +128,22 @@ void shift (char **parsedargs, int argc) {
   /* Shift by n if possible */
   else if (argc == 2 && shifted + atoi(parsedargs[1]) < globalargc - 1) {
     shifted = shifted + atoi(parsedargs[1]);
+    dollarques = 0;
   }
   /* Shift by 1 if possible */
   else if (argc == 1 && shifted + 1 < globalargc - 1) {
     shifted = shifted + 1;
+    dollarques = 0;
   }
   /* Shift too large */
   else {
     fprintf(stderr, "Shift value too large\n");
   }
+  return;
 }
 
 void unshift (char **parsedargs, int argc) {
+  dollarques = 1;
   /* Print error */
   if (argc > 2) {
     fprintf(stderr, "Incorrect number of arguments.\n");
@@ -138,21 +151,26 @@ void unshift (char **parsedargs, int argc) {
   /* Unshift by n if possible */
   else if (argc == 2 && atoi(parsedargs[1]) <= shifted) {
     shifted = shifted - atoi(parsedargs[1]);
+    dollarques = 0;
   }
   /* Unshift entirely if possible */
   else if (argc == 1) {
     shifted = 0;
+    dollarques = 0;
   }
   /* Unshift too large */
   else {
     fprintf(stderr, "Unshift value too large\n");
   }
+  return;
 }
 
 void sstat (char **parsedargs, int argc) {
+  dollarques = 0;
   /* Print error */
   if (argc < 2) {
     fprintf(stderr, "Incorrect number of arguments.\n");
+    dollarques = 1;
   }
   /* Loops through and get info about each file */
   else if (argc >= 2) {
@@ -193,6 +211,7 @@ void sstat (char **parsedargs, int argc) {
       /* Could not open file */
       else {
         perror ("open");
+        dollarques = 1;
       }
     }
   }
