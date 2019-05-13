@@ -30,7 +30,7 @@ int shifted = 0;
 
 /* Prototypes */
 
-void processline (char *line);
+int processline (char *line, int outfd, int flags);
 char ** arg_parse (char *line, int *argcptr);
 void removequotes(char *line);
 
@@ -74,7 +74,7 @@ int main (int mainargc, char **mainargv) {
     buffer[ix] = 0;
 
   	/* Run it ... */
-  	processline (buffer);
+  	processline (buffer,1,0);
 
   }
 
@@ -84,8 +84,7 @@ int main (int mainargc, char **mainargv) {
     return 0;		/* Also known as exit (0); */
 }
 
-void processline (char *line)
-{
+int processline (char *line, int outfd, int flags) {
     pid_t  cpid;
     int    status;
     int    argc;
@@ -96,7 +95,7 @@ void processline (char *line)
     int expanded = expand(line, newline, LINELEN);
 
     if (expanded == -1) {
-      return;
+      return -1;
     }
 
     /* Parse the argument */
@@ -104,17 +103,17 @@ void processline (char *line)
 
     /* Return if error in arg_parse */
     if (parsedargs == NULL) {
-      return;
+      return -1;
     }
 
     /* Return if no args */
     if (argc == 0) {
-      return;
+      return -1;
     }
 
     /* Check if builtin and exec if so */
     if (isbuiltin(parsedargs, argc) == 1) {
-      return;
+      return 0;
     }
     /* End of code by Michael Albert */
 
@@ -125,12 +124,16 @@ void processline (char *line)
       if (cpid < 0) {
         /* Fork wasn't successful */
         perror ("fork");
-        return;
+        return -1;
       }
 
       /* Check for who we are! */
       if (cpid == 0) {
         /* We are the child! */
+        /* Put output onto stdout */
+        if (outfd != 1) {
+          dup2(outfd,1);
+        }
         execvp (parsedargs[0], parsedargs);
         /* execvp reurned, wasn't successful */
         perror ("exec");
@@ -139,15 +142,22 @@ void processline (char *line)
       }
 
       /* Have the parent wait for child to complete */
-      if (wait (&status) < 0) {
-        /* Wait wasn't successful */
-        perror ("wait");
+      if (flags == 0) {
+        if (wait (&status) < 0) {
+          /* Wait wasn't successful */
+          perror ("wait");
+          return -1;
+        }
+      }
+      /* Return pid of child instead */
+      else if (flags == 1) {
+        return cpid;
       }
     }
 
     /* Free malloc'd space */
     free(parsedargs);
-    return;
+    return 1;
 }
 
 /* Start of code by Michael Albert */
