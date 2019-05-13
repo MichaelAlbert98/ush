@@ -141,6 +141,9 @@ int processline (char *line, int outfd, int flags) {
         exit (127);
       }
 
+      /* Free malloc'd space */
+      free(parsedargs);
+      
       /* Have the parent wait for child to complete */
       if (flags == 0) {
         if (wait (&status) < 0) {
@@ -154,10 +157,6 @@ int processline (char *line, int outfd, int flags) {
         return cpid;
       }
     }
-
-    /* Free malloc'd space */
-    free(parsedargs);
-    return 1;
 }
 
 /* Start of code by Michael Albert */
