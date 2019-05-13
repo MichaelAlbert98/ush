@@ -1,7 +1,7 @@
 /*   CS 347 -- Expand
  *
  *   April 14, 2019, Michael Albert
- *   Modified May 06, 2019
+ *   Modified May 12, 2019
  *
  */
 
@@ -20,10 +20,14 @@ int specprocess (char *orig, char *new, int newsize);
 int wildcard (char *orig, char *new, int newsize);
 int checkdigits (char *orig);
 int copychars (char *new, char *copy, int newsize);
+int processline (char *line, int outfd, int flags);
 
 /* Global Variables */
-int ix = 0;
-int jx = 0;
+int ix;
+int jx;
+
+/* Constants */
+#define MAXSIZE 200000
 
 /* Expand */
 
@@ -93,6 +97,7 @@ int specprocess (char *orig, char *new, int newsize) {
     }
   }
 
+  /* Replace with env var */
   else if (orig[ix+1] == '{') {
     temp = ix+2;
     /* Loop until '}' found */
@@ -107,6 +112,7 @@ int specprocess (char *orig, char *new, int newsize) {
     /* Get environment from ${NAME} */
     orig[ix] = 0;
     env = getenv(&orig[temp]);
+    /* Replace '}' */
     orig[ix] = '}';
     ix++;
     /* Add env to new if it exists */
@@ -114,6 +120,68 @@ int specprocess (char *orig, char *new, int newsize) {
       if (copychars(new, env, newsize) == -1) {
         return -1;
       }
+    }
+  }
+
+  /* Command output expansion */
+  else if (orig[ix+1] == '(') {
+    temp = ix+2;
+    int numparen = -1;
+    /* Loop until closing ')' found */
+    while (orig[ix] != ')' || numparen != 0) {
+      /* Increment if more open parens found */
+      if (orig[ix] == '(') {
+        numparen++;
+      }
+      /* Decrement if close parens found */
+      else if (orig[ix] == ')') {
+        numparen--;
+      }
+      /* Return if no closing paren */
+      else if (orig[ix] == 0) {
+        printf("No matching ) found.\n");
+        return -1;
+      }
+      ix++;
+    }
+    /* Store end of string over ')', create a pipe */
+    orig[ix] = 0;
+    int fd[2];
+    /* Check for error */
+    if (pipe(fd) < 0) {
+      perror("pipe");
+      return -1;
+    }
+    /* Check for processing error */
+    if (processline(&orig[temp], fd[1], 1) < 0) {
+      close(fd[0]);
+      close(fd[1]);
+      printf("Error processing line.\n");
+      return -1;
+    }
+    /* Close write end of pipe, start read loop */
+    close(fd[1]);
+    /* Read until EoF or buffer full */
+    while (read(fd[0],&new[jx],1) != 0) {
+      if (jx == MAXSIZE) {
+        fprintf(stderr, "Expansion too long.\n");
+        return -1;
+      }
+      jx++;
+    }
+    /* Replace ')' */
+    orig[ix] = ')';
+    ix++;
+  }
+
+  /* Print out global val from $? */
+  else if (orig[ix+1] == '?') {
+    ix = ix + 2;
+    char buffer[3];
+    snprintf(buffer, 3, "%d", dollarques);
+    /* Add pid to new */
+    if (copychars(new, buffer, newsize) == -1) {
+      return -1;
     }
   }
 
