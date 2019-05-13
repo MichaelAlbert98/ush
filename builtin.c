@@ -73,9 +73,9 @@ void envsetbuilt (char **parsedargs, int argc) {
     fprintf(stderr, "Incorrect number of arguments.\n");
     dollarques = 1;
   }
-  /* Set the given environment. No overwriting */
+  /* Set the given environment. onceverwriting allowed */
   else {
-    setenv(parsedargs[1],parsedargs[2],0);
+    setenv(parsedargs[1],parsedargs[2],1);
     dollarques = 0;
   }
   return;
