@@ -1,7 +1,7 @@
 /*   CS 347 -- Expand
  *
  *   April 14, 2019, Michael Albert
- *   Modified May 12, 2019
+ *   Modified May 14, 2019
  *
  */
 
@@ -25,7 +25,7 @@ int copychars (char *new, char *copy, int newsize, int *jx);
 int processline (char *line, int outfd, int flags);
 
 /* Constants */
-#define MAXSIZE 200000
+#define LINELEN 200000
 
 /* Expand */
 
@@ -151,8 +151,8 @@ int specprocess (char *orig, char *new, int newsize, int *ix, int *jx) {
       return -1;
     }
     /* Check for processing error */
-    int pid;
-    if ((pid = processline(&orig[temp], fd[1], 1)) < 0) {
+    int pl;
+    if ((pl = processline(&orig[temp], fd[1], 0)) < 0) {
       close(fd[0]);
       close(fd[1]);
       printf("Error processing line.\n");
@@ -161,12 +161,13 @@ int specprocess (char *orig, char *new, int newsize, int *ix, int *jx) {
     /* Close write end of pipe, start read loop */
     close(fd[1]);
     /* Read until EoF or buffer full */
-    while (read(fd[0],&new[*jx],1) != 0) {
-      if (*jx == MAXSIZE) {
-        fprintf(stderr, "Expansion too long.\n");
+    int bytesread;
+    while ((bytesread = read(fd[0], &new[*jx], LINELEN - *jx)) != 0) {
+      if (bytesread < 0) {
+        perror ("read");
         return -1;
       }
-      (*jx)++;
+      *jx = *jx + bytesread;
     }
     /* Remove last '\n' if it exists */
     if (new[*jx-1] == '\n') {
@@ -183,13 +184,19 @@ int specprocess (char *orig, char *new, int newsize, int *ix, int *jx) {
     /* Replace ')' */
     orig[*ix] = ')';
     (*ix)++;
-    /* Close read end of pipe, wait for child */
+    /* Close read end of pipe, wait for child unless built-in */
     close(fd[0]);
-    int status;
-    if (wait (&status) < 0) {
-      /* Wait wasn't successful */
-      perror ("wait");
-      return -1;
+    if (pl > 0) {
+      int status;
+      if (waitpid(pl, &status, 0) < 0) {
+        /* Wait wasn't successful */
+        perror ("wait");
+        return -1;
+      }
+      /* Determine if exited. If so, set dollarques to exit val */
+      if (WIFEXITED(status)) {
+        dollarques = WEXITSTATUS(status);
+      }
     }
   }
 
