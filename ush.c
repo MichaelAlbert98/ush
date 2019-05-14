@@ -6,7 +6,7 @@
  *   Modified January 8, 2017
  *
  *   April 03, 2019, Michael Albert
- *   Modified May 06, 2019
+ *   Modified May 14, 2019
  *
  */
 
@@ -26,7 +26,9 @@ int shifted = 0;
 
 /* Constants */
 
-#define LINELEN 1024
+#define LINELEN 200000
+#define WAIT 1
+#define NOWAIT 0
 
 /* Prototypes */
 
@@ -74,7 +76,7 @@ int main (int mainargc, char **mainargv) {
     buffer[ix] = 0;
 
   	/* Run it ... */
-  	processline (buffer,1,0);
+  	processline (buffer,1,WAIT);
 
   }
 
@@ -143,20 +145,34 @@ int processline (char *line, int outfd, int flags) {
 
       /* Free malloc'd space */
       free(parsedargs);
-      
+
       /* Have the parent wait for child to complete */
-      if (flags == 0) {
+      if (flags == WAIT) {
         if (wait (&status) < 0) {
           /* Wait wasn't successful */
           perror ("wait");
           return -1;
         }
+        /* Determine if exited. If so, set dollarquest to exit val */
+        if (WIFEXITED(status)) {
+          dollarques = WEXITSTATUS(status);
+        }
+        /* See if process ended due to signal. */
+        if ((WIFSIGNALED(status) && (WTERMSIG(status) != SIGINT))){
+          printf("Signal %d terminated child", WTERMSIG(status));
+          dollarques = 128 + WTERMSIG(status);
+          /* Check if core dumped */
+          if (WCOREDUMP(status)) {
+            printf(" (core dumped)\n");
+          }
+        }
       }
       /* Return pid of child instead */
-      else if (flags == 1) {
+      else if (flags == NOWAIT) {
         return cpid;
       }
     }
+    return 0;
 }
 
 /* Start of code by Michael Albert */
