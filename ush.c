@@ -153,20 +153,20 @@ int processline (char *line, int outfd, int flags) {
           perror ("wait");
           return -1;
         }
-        /* Determine if exited. If so, set dollarquest to exit val */
-        else if (WIFEXITED(status)) {
-          dollarques = WEXITSTATUS(status);
-        }
         /* See if process ended due to signal. */
-        else if ((WIFSIGNALED(status) && (WTERMSIG(status) != SIGINT))){
+        else if ((WIFSIGNALED(status) && (WTERMSIG(status) != SIGINT))) {
           char *issignal = strsignal(status);
-          fprintf(stderr, "%s\n", issignal);
+          fprintf(stderr, "%s", issignal);
           /* Check if core dumped */
           if (WCOREDUMP(status)) {
             fprintf(stderr, " (core dumped)");
           }
           fprintf(stderr, "\n");
           dollarques = 128 + WTERMSIG(status);
+        }
+        /* Determine if exited. If so, set dollarquest to exit val */
+        else if (WIFEXITED(status)) {
+          dollarques = WEXITSTATUS(status);
         }
       }
       /* Return pid of child instead */

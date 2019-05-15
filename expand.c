@@ -197,17 +197,6 @@ int specprocess (char *orig, char *new, int newsize, int *ix, int *jx) {
       if (WIFEXITED(status)) {
         dollarques = WEXITSTATUS(status);
       }
-      /* See if process ended due to signal. */
-      else if ((WIFSIGNALED(status) && (WTERMSIG(status) != SIGINT))){
-        char *issignal = strsignal(status);
-        fprintf(stderr, "%s\n", issignal);
-        /* Check if core dumped */
-        if (WCOREDUMP(status)) {
-          fprintf(stderr, " (core dumped)");
-        }
-        fprintf(stderr, "\n");
-        dollarques = 128 + WTERMSIG(status);
-      }
     }
   }
 
