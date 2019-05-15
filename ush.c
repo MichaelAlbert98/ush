@@ -160,13 +160,13 @@ int processline (char *line, int outfd, int flags) {
         /* See if process ended due to signal. */
         else if ((WIFSIGNALED(status) && (WTERMSIG(status) != SIGINT))){
           char *issignal = strsignal(status);
-          printf("%s\n", issignal);
-          dollarques = 128 + WTERMSIG(status);
+          fprintf(stderr, "%s\n", issignal);
           /* Check if core dumped */
           if (WCOREDUMP(status)) {
-            printf(" (core dumped)");
+            fprintf(stderr, " (core dumped)");
           }
-          printf("\n");
+          fprintf(stderr, "\n");
+          dollarques = 128 + WTERMSIG(status);
         }
       }
       /* Return pid of child instead */
