@@ -154,14 +154,18 @@ int processline (char *line, int outfd, int flags) {
           return -1;
         }
         /* See if process ended due to signal. */
-        else if ((WIFSIGNALED(status) && (WTERMSIG(status) != SIGINT))) {
-          char *issignal = strsignal(status);
-          fprintf(stderr, "%s", issignal);
-          /* Check if core dumped */
-          if (WCOREDUMP(status)) {
-            fprintf(stderr, " (core dumped)");
+        else if (WIFSIGNALED(status)) {
+          int signalint = WTERMSIG(status);
+          char *issignal = strsignal(signalint);
+          /* Only print out signal text if not SIGINT */
+          if (signalint != SIGINT) {
+            fprintf(stderr, "%s", issignal);
+            /* Check if core dumped */
+            if (WCOREDUMP(status)) {
+              fprintf(stderr, " (core dumped)");
+            }
+            fprintf(stderr, "\n");
           }
-          fprintf(stderr, "\n");
           dollarques = 128 + WTERMSIG(status);
         }
         /* Determine if exited. If so, set dollarquest to exit val */
