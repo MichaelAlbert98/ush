@@ -159,12 +159,12 @@ int processline (char *line, int outfd, int flags) {
           char *issignal = strsignal(signalint);
           /* Only print out signal text if not SIGINT */
           if (signalint != SIGINT) {
-            fprintf(stderr, "%s", issignal);
+            printf("%s", issignal);
             /* Check if core dumped */
             if (WCOREDUMP(status)) {
-              fprintf(stderr, " (core dumped)");
+              printf(" (core dumped)");
             }
-            fprintf(stderr, "\n");
+            printf("\n");
           }
           dollarques = 128 + WTERMSIG(status);
         }
