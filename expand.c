@@ -203,8 +203,8 @@ int specprocess (char *orig, char *new, int newsize, int *ix, int *jx) {
   /* Print out global val from $? */
   else if (orig[*ix+1] == '?') {
     *ix = *ix + 2;
-    char buffer[3];
-    snprintf(buffer, 3, "%d", dollarques);
+    char buffer[5];
+    snprintf(buffer, 5, "%d", dollarques);
     /* Add pid to new */
     if (copychars(new, buffer, newsize, jx) == -1) {
       return -1;
