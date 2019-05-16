@@ -1,7 +1,7 @@
 /*   CS 347 -- Expand
  *
  *   April 14, 2019, Michael Albert
- *   Modified May 14, 2019
+ *   Modified May 16, 2019
  *
  */
 
@@ -35,7 +35,7 @@ int expand (char *orig, char *new, int newsize) {
   int jx = 0;
 
   /* Loop through orig once */
-  while (orig[ix] != 0) {
+  while (orig[ix] != 0 && !gotsigint) {
     /* Replace text with something else */
     if (orig[ix] == '$') {
       int processed = specprocess (orig, new, newsize, &ix, &jx);
@@ -293,7 +293,7 @@ int wildcard (char *orig, char *new, int newsize, int *ix, int *jx) {
     }
     struct dirent *entry;
     /* Pull name from entry for each directory */
-    while ((entry = readdir(workingdirec)) != NULL) {
+    while ((entry = readdir(workingdirec)) != NULL && !gotsigint) {
         char *name = entry->d_name;
         /* Add to new if it doesn't start with '.' */
         if (name[0] != '.') {
@@ -338,7 +338,7 @@ int wildcard (char *orig, char *new, int newsize, int *ix, int *jx) {
     int found = *jx;
     int len = strlen(&orig[temp]);
     /* Pull name from entry for each directory */
-    while ((entry = readdir(workingdirec)) != NULL) {
+    while ((entry = readdir(workingdirec)) != NULL && !gotsigint) {
         char *name = entry->d_name;
         /* Add to new if it doesn't start with '.' and
            the last len chars are the same as context */
