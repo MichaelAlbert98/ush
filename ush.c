@@ -6,7 +6,7 @@
  *   Modified January 8, 2017
  *
  *   April 03, 2019, Michael Albert
- *   Modified May 14, 2019
+ *   Modified May 16, 2019
  *
  */
 
@@ -17,11 +17,14 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <signal.h>
 #include "defn.h"
 #include "globals.h"
 
 int globalargc;
 char **globalargv;
+int gotsigint;
+int dollarques = 0;
 int shifted = 0;
 
 /* Constants */
@@ -35,6 +38,7 @@ int shifted = 0;
 int processline (char *line, int outfd, int flags);
 char ** arg_parse (char *line, int *argcptr);
 void removequotes(char *line);
+void siginthandler (int sig);
 
 /* Shell main */
 
@@ -55,7 +59,11 @@ int main (int mainargc, char **mainargv) {
     input = stdin;
   }
 
+  signal(SIGINT, siginthandler);
+
   while (1) {
+
+    gotsigint = 0;
 
     /* prompt and get line */
     if (input == stdin) {
@@ -76,7 +84,7 @@ int main (int mainargc, char **mainargv) {
     buffer[ix] = 0;
 
   	/* Run it ... */
-  	processline (buffer,1,WAIT);
+  	processline (buffer, 1, WAIT);
 
   }
 
@@ -92,7 +100,6 @@ int processline (char *line, int outfd, int flags) {
     int    argc;
     char   newline [LINELEN];
 
-    /* Start of code by Michael Albert */
     /* Expand line and check if error */
     int expanded = expand(line, newline, LINELEN);
 
@@ -166,9 +173,10 @@ int processline (char *line, int outfd, int flags) {
             }
             printf("\n");
           }
+          fflush(stdout);
           dollarques = 128 + WTERMSIG(status);
         }
-        /* Determine if exited. If so, set dollarquest to exit val */
+        /* Determine if exited. If so, set dollarques to exit val */
         else if (WIFEXITED(status)) {
           dollarques = WEXITSTATUS(status);
         }
@@ -181,7 +189,6 @@ int processline (char *line, int outfd, int flags) {
     return 0;
 }
 
-/* Start of code by Michael Albert */
 char** arg_parse (char *line, int *argcptr)
 {
     int    argc; //keeps track of total args
@@ -298,4 +305,11 @@ void removequotes (char *line) {
   line[dst] = 0;
   return;
 }
-/* End of code by Michael Albert */
+
+void siginthandler (int sig) {
+  gotsigint = 1;
+  signal(sig, SIG_IGN);
+  signal(SIGINT, siginthandler);
+
+  return;
+}
