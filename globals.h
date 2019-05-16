@@ -1,7 +1,7 @@
 /*   CS 347 -- Global Vars
  *
  *   May 05, 2019, Michael Albert
- *   Modified May 11, 2019
+ *   Modified May 16, 2019
  *
  */
 
@@ -11,4 +11,5 @@
 extern int globalargc;
 extern char **globalargv;
 extern int shifted;
-int dollarques;
+extern int dollarques;
+extern int gotsigint;
