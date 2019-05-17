@@ -30,12 +30,14 @@ int shifted = 0;
 /* Constants */
 
 #define LINELEN 200000
-#define WAIT 1
-#define NOWAIT 0
+const int WAIT = 1;
+const int NOWAIT = 0;
+const int EXPAND = 2;
+const int NOEXPAND = 0;
 
 /* Prototypes */
 
-int processline (char *line, int outfd, int flags);
+int processline (char *line, int infd, int outfd, int flags);
 char ** arg_parse (char *line, int *argcptr);
 void removequotes(char *line);
 void siginthandler (int sig);
@@ -63,14 +65,14 @@ int main (int mainargc, char **mainargv) {
 
   while (1) {
 
-    gotsigint = 0;
-
     /* prompt and get line */
     if (input == stdin) {
     	fprintf (stderr, "%% ");
     }
   	if (fgets (buffer, LINELEN, input) != buffer)
   	  break;
+
+    gotsigint = 0;
 
     /* Get rid of \n at end of buffer or comments. */
     ix = 0;
@@ -84,7 +86,7 @@ int main (int mainargc, char **mainargv) {
     buffer[ix] = 0;
 
   	/* Run it ... */
-  	processline (buffer, 1, WAIT);
+  	processline (buffer, 0, 1, WAIT | EXPAND);
 
   }
 
@@ -94,18 +96,47 @@ int main (int mainargc, char **mainargv) {
     return 0;		/* Also known as exit (0); */
 }
 
-int processline (char *line, int outfd, int flags) {
+int processline (char *line, int infd, int outfd, int flags) {
     pid_t  cpid;
     int    status;
     int    argc;
+    int    ix, jx;
     char   newline [LINELEN];
 
-    /* Expand line and check if error */
-    int expanded = expand(line, newline, LINELEN);
+    /* Run expand if flag set */
+    if (flags & EXPAND) {
+      /* Expand line and check if error */
+      int expanded = expand(line, newline, LINELEN);
 
-    if (expanded == -1) {
-      return -1;
+      if (expanded == -1) {
+        return -1;
+      }
     }
+
+    /* Find pipelines */
+    int fd1[2];
+    int fd2[2];
+    while (newline[ix] != 0) {
+      /* Process section if pipe found */
+      if (newline[ix] == '|') {
+        /* Store end of string over '|', create a pipe */
+        newline[ix] = 0;
+        /* Check for error */
+        if (pipe(fd2) < 0) {
+          perror("pipe");
+          return -1;
+        }
+        processline(&newline[jx], fd1[0], fd2[1], NOWAIT | NOEXPAND);
+        close(fd1[0]);
+        close(fd2[1]);
+        fd1[0] = fd2[0];
+        /* Add '|' back in, set jx to start of next arg */
+        newline[ix] == '|';
+        jx = ix + 1;
+      }
+      ix++;
+    }
+
 
     /* Parse the argument */
     char** parsedargs = arg_parse(newline, &argc);
@@ -124,7 +155,6 @@ int processline (char *line, int outfd, int flags) {
     if (isbuiltin(parsedargs, argc) == 1) {
       return 0;
     }
-    /* End of code by Michael Albert */
 
     /* Otherwise fork the process */
     else {
@@ -154,7 +184,7 @@ int processline (char *line, int outfd, int flags) {
       free(parsedargs);
 
       /* Have the parent wait for child to complete */
-      if (flags == WAIT) {
+      if (flags & WAIT) {
         if (wait (&status) < 0) {
           /* Wait wasn't successful */
           perror ("wait");
@@ -182,7 +212,7 @@ int processline (char *line, int outfd, int flags) {
         }
       }
       /* Return pid of child instead */
-      else if (flags == NOWAIT) {
+      else {
         return cpid;
       }
     }
@@ -307,9 +337,9 @@ void removequotes (char *line) {
 }
 
 void siginthandler (int sig) {
+  /* Send SIGINT to all processes being waited on */
   gotsigint = 1;
   signal(sig, SIG_IGN);
   signal(SIGINT, siginthandler);
-
   return;
 }
