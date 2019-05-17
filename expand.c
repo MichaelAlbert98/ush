@@ -22,7 +22,7 @@ int specprocess (char *orig, char *new, int newsize, int *ix, int *jx);
 int wildcard (char *orig, char *new, int newsize, int *ix, int *jx);
 int checkdigits (char *orig, int *ix);
 int copychars (char *new, char *copy, int newsize, int *jx);
-int processline (char *line, int outfd, int flags);
+int processline (char *line, int infd, int outfd, int flags);
 
 /* Constants */
 #define LINELEN 200000
@@ -152,7 +152,7 @@ int specprocess (char *orig, char *new, int newsize, int *ix, int *jx) {
     }
     /* Check for processing error */
     int pl;
-    if ((pl = processline(&orig[temp], fd[1], 0)) < 0) {
+    if ((pl = processline(&orig[temp], 0, fd[1], NOWAIT | EXPAND)) < 0) {
       close(fd[0]);
       close(fd[1]);
       printf("Error processing line.\n");
