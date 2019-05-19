@@ -149,10 +149,6 @@ int processline (char *line, int infd, int outfd, int flags) {
         killzombies();
       }
       return ret;
-
-      /* Final call */
-      //infd = fd1[0];
-      //parsedargs = arg_parse(&newline[jx], &argc);
     }
     else {
       /* Parse the argument (pipe calls only) */
@@ -367,6 +363,6 @@ void siginthandler (int sig) {
 
 void killzombies() {
   /* Wait for any zombies */
-  while(wait(NULL) > 0);
+  while(waitpid(-1, NULL, WNOHANG) > 0);
   return;
 }
