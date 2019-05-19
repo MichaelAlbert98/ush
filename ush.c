@@ -1,4 +1,4 @@
-/*   CS 347 -- Micro Shell!
+  /*   CS 347 -- Micro Shell!
  *
  *   Sept 21, 2000,  Phil Nelson
  *   Modified April 8, 2001
@@ -87,7 +87,6 @@ int main (int mainargc, char **mainargv) {
 
   	/* Run it ... */
   	processline (buffer, 0, 1, WAIT | EXPAND);
-
   }
 
     if (!feof(input))
@@ -100,8 +99,9 @@ int processline (char *line, int infd, int outfd, int flags) {
     pid_t  cpid;
     int    status;
     int    argc;
-    int    ix, jx;
+    int    ix, jx = 0;
     char   newline [LINELEN];
+    char** parsedargs;
 
     /* Run expand if flag set */
     if (flags & EXPAND) {
@@ -111,35 +111,43 @@ int processline (char *line, int infd, int outfd, int flags) {
       if (expanded == -1) {
         return -1;
       }
-    }
 
-    /* Find pipelines */
-    int fd1[2];
-    int fd2[2];
-    while (newline[ix] != 0) {
-      /* Process section if pipe found */
-      if (newline[ix] == '|') {
-        /* Store end of string over '|', create a pipe */
-        newline[ix] = 0;
-        /* Check for error */
-        if (pipe(fd2) < 0) {
-          perror("pipe");
-          return -1;
+      /* Find pipelines */
+      int fd1[2] = {infd};
+      int fd2[2] = {outfd};
+      while (newline[ix] != 0) {
+        /* Process section if pipe found */
+        if (newline[ix] == '|') {
+          /* Store end of string over '|', create a pipe */
+          newline[ix] = 0;
+          /* Check for error */
+          if (pipe(fd2) < 0) {
+            perror("pipe");
+            return -1;
+          }
+          processline(&newline[jx], fd1[0], fd2[1], NOWAIT | NOEXPAND);
+          close(fd1[0]);
+          close(fd2[1]);
+          fd1[0] = fd2[0];
+          /* Add '|' back in, set jx to start of next arg */
+          newline[ix] = '|';
+          jx = ix + 1;
         }
-        processline(&newline[jx], fd1[0], fd2[1], NOWAIT | NOEXPAND);
-        close(fd1[0]);
-        close(fd2[1]);
-        fd1[0] = fd2[0];
-        /* Add '|' back in, set jx to start of next arg */
-        newline[ix] == '|';
-        jx = ix + 1;
+        ix++;
       }
-      ix++;
+      /* Final call */
+      //int ret = processline(&newline[jx], fd1[0], outfd, flags & WAIT);
+      //close(fd1[0]);
+      //return ret;
+
+      /* Final call */
+      infd = fd1[0];
+      parsedargs = arg_parse(&newline[jx], &argc);
     }
-
-
-    /* Parse the argument */
-    char** parsedargs = arg_parse(newline, &argc);
+    else {
+      /* Parse the argument (pipe calls only) */
+      parsedargs = arg_parse(line, &argc);
+    }
 
     /* Return if error in arg_parse */
     if (parsedargs == NULL) {
@@ -169,7 +177,10 @@ int processline (char *line, int infd, int outfd, int flags) {
       /* Check for who we are! */
       if (cpid == 0) {
         /* We are the child! */
-        /* Put output onto stdout */
+        /* Put input/output onto stdin/stdout */
+        if (infd != 0) {
+          dup2(infd,0);
+        }
         if (outfd != 1) {
           dup2(outfd,1);
         }
