@@ -103,6 +103,7 @@ int processline (char *line, int infd, int outfd, int flags) {
     int    jx = 0;
     char   newline [LINELEN];
     char** parsedargs;
+    int    numpipes = 0;
 
     /* Run expand if flag set */
     if (flags & EXPAND) {
@@ -115,10 +116,11 @@ int processline (char *line, int infd, int outfd, int flags) {
 
       /* Find pipelines */
       int fd1[2] = {infd};
-      int fd2[2] = {outfd};
+      int fd2[2];
       while (newline[ix] != 0) {
         /* Process section if pipe found */
         if (newline[ix] == '|') {
+          numpipes++;
           /* Store end of string over '|', create a pipe */
           newline[ix] = 0;
           /* Check for error */
@@ -127,7 +129,9 @@ int processline (char *line, int infd, int outfd, int flags) {
             return -1;
           }
           processline(&newline[jx], fd1[0], fd2[1], NOWAIT | NOEXPAND);
-          close(fd1[0]);
+          if (numpipes != 1) {
+            close(fd1[0]);
+          }
           close(fd2[1]);
           fd1[0] = fd2[0];
           /* Add '|' back in, set jx to start of next arg */
@@ -137,9 +141,11 @@ int processline (char *line, int infd, int outfd, int flags) {
         ix++;
       }
       /* Final call */
-      int ret = processline(&newline[jx], fd1[0], outfd, flags & WAIT);
-      close(fd1[0]);
-      return ret;
+      processline(&newline[jx], fd1[0], outfd, flags & WAIT);
+      if (numpipes != 0) {
+        close(fd1[0]);
+      }
+      return 0;
 
       /* Final call */
       //infd = fd1[0];
