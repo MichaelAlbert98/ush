@@ -99,7 +99,8 @@ int processline (char *line, int infd, int outfd, int flags) {
     pid_t  cpid;
     int    status;
     int    argc;
-    int    ix, jx = 0;
+    int    ix = 0;
+    int    jx = 0;
     char   newline [LINELEN];
     char** parsedargs;
 
@@ -136,13 +137,13 @@ int processline (char *line, int infd, int outfd, int flags) {
         ix++;
       }
       /* Final call */
-      //int ret = processline(&newline[jx], fd1[0], outfd, flags & WAIT);
-      //close(fd1[0]);
-      //return ret;
+      int ret = processline(&newline[jx], fd1[0], outfd, flags & WAIT);
+      close(fd1[0]);
+      return ret;
 
       /* Final call */
-      infd = fd1[0];
-      parsedargs = arg_parse(&newline[jx], &argc);
+      //infd = fd1[0];
+      //parsedargs = arg_parse(&newline[jx], &argc);
     }
     else {
       /* Parse the argument (pipe calls only) */
