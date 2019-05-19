@@ -41,6 +41,7 @@ int processline (char *line, int infd, int outfd, int flags);
 char ** arg_parse (char *line, int *argcptr);
 void removequotes(char *line);
 void siginthandler (int sig);
+void killzombies();
 
 /* Shell main */
 
@@ -104,6 +105,7 @@ int processline (char *line, int infd, int outfd, int flags) {
     char   newline [LINELEN];
     char** parsedargs;
     int    numpipes = 0;
+    int    ret;
 
     /* Run expand if flag set */
     if (flags & EXPAND) {
@@ -128,7 +130,7 @@ int processline (char *line, int infd, int outfd, int flags) {
             perror("pipe");
             return -1;
           }
-          processline(&newline[jx], fd1[0], fd2[1], NOWAIT | NOEXPAND);
+          ret = processline(&newline[jx], fd1[0], fd2[1], NOWAIT | NOEXPAND);
           if (numpipes != 1) {
             close(fd1[0]);
           }
@@ -141,11 +143,12 @@ int processline (char *line, int infd, int outfd, int flags) {
         ix++;
       }
       /* Final call */
-      processline(&newline[jx], fd1[0], outfd, flags & WAIT);
+      ret = processline(&newline[jx], fd1[0], outfd, flags & WAIT);
       if (numpipes != 0) {
         close(fd1[0]);
+        killzombies();
       }
-      return 0;
+      return ret;
 
       /* Final call */
       //infd = fd1[0];
@@ -359,5 +362,11 @@ void siginthandler (int sig) {
   gotsigint = 1;
   signal(sig, SIG_IGN);
   signal(SIGINT, siginthandler);
+  return;
+}
+
+void killzombies() {
+  /* Wait for any zombies */
+  while(wait(NULL) > 0);
   return;
 }
