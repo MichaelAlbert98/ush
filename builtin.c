@@ -25,25 +25,25 @@ const char* builtins[] = { "exit", "envset", "envunset", "cd", "shift",
 
 /* Prototypes */
 
-void exitbuilt (char **parsedargs, int argc);
-void envsetbuilt (char **parsedargs, int argc);
-void envunsetbuilt (char **parsedargs, int argc);
-void cdbuilt (char **parsedargs, int argc);
-void shift (char **parsedargs, int argc);
-void unshift (char **parsedargs, int argc);
-void sstat (char **parsedargs, int argc);
+void exitbuilt (char **parsedargs, int argc, int outfd);
+void envsetbuilt (char **parsedargs, int argc, int outfd);
+void envunsetbuilt (char **parsedargs, int argc, int outfd);
+void cdbuilt (char **parsedargs, int argc, int outfd);
+void shift (char **parsedargs, int argc, int outfd);
+void unshift (char **parsedargs, int argc, int outfd);
+void sstat (char **parsedargs, int argc, int outfd);
 void strmode (mode_t mode, char *p);
 
 /* Builtin */
 
-int isbuiltin (char **parsedargs, int argc) {
+int isbuiltin (char **parsedargs, int argc, int outfd) {
   /* Check if command is a builtin */
   for (int i = 0; i < BUILTINNUM; i++) {
     if (strcmp(parsedargs[0], builtins[i]) == 0) {
       /* Call corresponding builtin helper */
-      void (*funcptrarr[])(char**, int) = {exitbuilt, envsetbuilt, envunsetbuilt,
+      void (*funcptrarr[])(char**, int, int) = {exitbuilt, envsetbuilt, envunsetbuilt,
             cdbuilt, shift, unshift, sstat};
-      (*funcptrarr[i])(parsedargs, argc);
+      (*funcptrarr[i])(parsedargs, argc, outfd);
       return 1;
     }
   }
@@ -51,7 +51,7 @@ int isbuiltin (char **parsedargs, int argc) {
   return 0;
 }
 
-void exitbuilt (char **parsedargs, int argc) {
+void exitbuilt (char **parsedargs, int argc, int outfd) {
   /* Print error */
   if (argc > 2) {
     fprintf(stderr, "Incorrect number of arguments.\n");
@@ -67,7 +67,7 @@ void exitbuilt (char **parsedargs, int argc) {
   return;
 }
 
-void envsetbuilt (char **parsedargs, int argc) {
+void envsetbuilt (char **parsedargs, int argc, int outfd) {
   /* Print error */
   if (argc != 3) {
     fprintf(stderr, "Incorrect number of arguments.\n");
@@ -81,7 +81,7 @@ void envsetbuilt (char **parsedargs, int argc) {
   return;
 }
 
-void envunsetbuilt (char **parsedargs, int argc) {
+void envunsetbuilt (char **parsedargs, int argc, int outfd) {
   /* Print error */
   if (argc != 2) {
     fprintf(stderr, "Incorrect number of arguments.\n");
@@ -95,7 +95,7 @@ void envunsetbuilt (char **parsedargs, int argc) {
   return;
 }
 
-void cdbuilt (char **parsedargs, int argc) {
+void cdbuilt (char **parsedargs, int argc, int outfd) {
   /* Print error */
   dollarques = 0;
   if (argc > 2) {
@@ -119,7 +119,7 @@ void cdbuilt (char **parsedargs, int argc) {
   return;
 }
 
-void shift (char **parsedargs, int argc) {
+void shift (char **parsedargs, int argc, int outfd) {
   dollarques = 1;
   /* Print error */
   if (argc > 2) {
@@ -142,7 +142,7 @@ void shift (char **parsedargs, int argc) {
   return;
 }
 
-void unshift (char **parsedargs, int argc) {
+void unshift (char **parsedargs, int argc, int outfd) {
   dollarques = 1;
   /* Print error */
   if (argc > 2) {
@@ -165,7 +165,7 @@ void unshift (char **parsedargs, int argc) {
   return;
 }
 
-void sstat (char **parsedargs, int argc) {
+void sstat (char **parsedargs, int argc, int outfd) {
   dollarques = 0;
   /* Print error */
   if (argc < 2) {
@@ -178,34 +178,34 @@ void sstat (char **parsedargs, int argc) {
       struct stat sbuf;
       if (stat(parsedargs[i], &sbuf) == 0) {
         /* File name */
-        printf("%s ", parsedargs[i]);
+        dprintf(outfd, "%s ", parsedargs[i]);
         /* User name */
         struct passwd *uname = getpwuid(sbuf.st_uid);
         if (uname == NULL) {
-          printf("%d ", sbuf.st_uid);
+          dprintf(outfd, "%d ", sbuf.st_uid);
         }
         else {
-          printf("%s ", uname->pw_name);
+          dprintf(outfd, "%s ", uname->pw_name);
         }
         /* Group name */
         struct group *gname = getgrgid(sbuf.st_gid);
         if (gname == NULL) {
-          printf("%d ", sbuf.st_gid);
+          dprintf(outfd, "%d ", sbuf.st_gid);
         }
         else {
-          printf("%s ", gname->gr_name);
+          dprintf(outfd, "%s ", gname->gr_name);
         }
         /* Permission list */
         char str[11];
         strmode(sbuf.st_mode, str);
-        printf("%s", str);
+        dprintf(outfd, "%s", str);
         /* Num links */
-        printf("%li ", sbuf.st_nlink);
+        dprintf(outfd, "%li ", sbuf.st_nlink);
         /* File size (bytes) */
-        printf("%li ", sbuf.st_size);
+        dprintf(outfd, "%li ", sbuf.st_size);
         /* Modification time */
         time_t sec = sbuf.st_mtim.tv_sec;
-        printf("%s", asctime(localtime(&sec)));
+        dprintf(outfd, "%s", asctime(localtime(&sec)));
         fflush(stdout);
       }
       /* Could not open file */
