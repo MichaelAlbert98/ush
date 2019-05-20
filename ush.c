@@ -26,6 +26,7 @@ char **globalargv;
 int gotsigint;
 int dollarques = 0;
 int shifted = 0;
+int waitingon = 0;
 
 /* Constants */
 
@@ -107,6 +108,11 @@ int processline (char *line, int infd, int outfd, int flags) {
     int    numpipes = 0;
     int    ret;
 
+    /* Make sure no sigint was found */
+    if (gotsigint == 1) {
+      return -1;
+    }
+
     /* Run expand if flag set */
     if (flags & EXPAND) {
       /* Expand line and check if error */
@@ -166,7 +172,7 @@ int processline (char *line, int infd, int outfd, int flags) {
     }
 
     /* Check if builtin and exec if so */
-    if (isbuiltin(parsedargs, argc) == 1) {
+    if (isbuiltin(parsedargs, argc, outfd) == 1) {
       return 0;
     }
 
@@ -202,6 +208,7 @@ int processline (char *line, int infd, int outfd, int flags) {
 
       /* Have the parent wait for child to complete */
       if (flags & WAIT) {
+        waitingon = cpid;
         if (wait (&status) < 0) {
           /* Wait wasn't successful */
           perror ("wait");
@@ -227,6 +234,7 @@ int processline (char *line, int infd, int outfd, int flags) {
         else if (WIFEXITED(status)) {
           dollarques = WEXITSTATUS(status);
         }
+        waitingon = 0;
       }
       /* Return pid of child instead */
       else {
@@ -354,7 +362,8 @@ void removequotes (char *line) {
 }
 
 void siginthandler (int sig) {
-  /* Send SIGINT to all processes being waited on */
+  /* Send SIGINT to process being waited on */
+  kill(waitingon, sig);
   gotsigint = 1;
   signal(sig, SIG_IGN);
   signal(SIGINT, siginthandler);
