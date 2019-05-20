@@ -13,6 +13,7 @@ extern char **globalargv;
 extern int shifted;
 extern int dollarques;
 extern int gotsigint;
+extern int waitingon;
 
 /* Global Consts */
 extern const int WAIT;
