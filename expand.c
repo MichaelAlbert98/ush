@@ -61,6 +61,11 @@ int expand (char *orig, char *new, int newsize) {
       ix++;
     }
   }
+  /* Make sure no buffer overflow */
+  if (jx == newsize) {
+    fprintf(stderr, "Expansion too long.\n");
+    return -1;
+  }
   /* Set final char as end of string */
   new[jx] = 0;
   return 0;
