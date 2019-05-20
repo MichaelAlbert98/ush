@@ -188,11 +188,13 @@ int specprocess (char *orig, char *new, int newsize, int *ix, int *jx) {
     close(fd[0]);
     if (pl > 0) {
       int status;
+      waitingon = pl;
       if (waitpid(pl, &status, 0) < 0) {
         /* Wait wasn't successful */
         perror ("wait");
         return -1;
       }
+      waitingon = 0;
       /* Determine if exited. If so, set dollarques to exit val */
       if (WIFEXITED(status)) {
         dollarques = WEXITSTATUS(status);
