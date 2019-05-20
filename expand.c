@@ -24,9 +24,6 @@ int checkdigits (char *orig, int *ix);
 int copychars (char *new, char *copy, int newsize, int *jx);
 int processline (char *line, int infd, int outfd, int flags);
 
-/* Constants */
-#define LINELEN 200000
-
 /* Expand */
 
 int expand (char *orig, char *new, int newsize) {
@@ -162,7 +159,7 @@ int specprocess (char *orig, char *new, int newsize, int *ix, int *jx) {
     close(fd[1]);
     /* Read until EoF or buffer full */
     int bytesread;
-    while ((bytesread = read(fd[0], &new[*jx], LINELEN - *jx)) != 0) {
+    while ((bytesread = read(fd[0], &new[*jx], newsize - *jx)) != 0) {
       if (bytesread < 0) {
         perror ("read");
         return -1;
