@@ -363,6 +363,6 @@ void siginthandler (int sig) {
 
 void killzombies() {
   /* Wait for any zombies */
-  while(wait(NULL) > 0);
+  while(waitpid(-1, NULL, WNOHANG) > 0);
   return;
 }
