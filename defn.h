@@ -13,6 +13,6 @@
  /* Prototypes */
 
  int expand (char *orig, char *new, int newsize);
- int isbuiltin (char **parsedargs, int argc);
+ int isbuiltin (char **parsedargs, int argc, int outfd);
 
 #endif
