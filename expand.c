@@ -52,7 +52,7 @@ int expand (char *orig, char *new, int newsize) {
     /* Copy over char */
     else {
       /* Make sure no buffer overflow */
-      if (jx == newsize) {
+      if (jx >= newsize) {
         fprintf(stderr, "Expansion too long.\n");
         return -1;
       }
@@ -60,11 +60,6 @@ int expand (char *orig, char *new, int newsize) {
       jx++;
       ix++;
     }
-  }
-  /* Make sure no buffer overflow */
-  if (jx == newsize) {
-    fprintf(stderr, "Expansion too long.\n");
-    return -1;
   }
   /* Set final char as end of string */
   new[jx] = 0;
@@ -248,7 +243,7 @@ int specprocess (char *orig, char *new, int newsize, int *ix, int *jx) {
   /* No special character after first $, copy over one char */
   else {
     /* Make sure no buffer overflow */
-    if (*jx == newsize) {
+    if (*jx >= newsize) {
       fprintf(stderr, "Expansion too long.\n");
       return -1;
     }
@@ -273,7 +268,7 @@ int wildcard (char *orig, char *new, int newsize, int *ix, int *jx) {
       return 0;
     }
     /* Make sure no buffer overflow */
-    if (*jx == newsize) {
+    if (*jx >= newsize) {
       fprintf(stderr, "Expansion too long.\n");
       return -1;
     }
@@ -418,7 +413,7 @@ int copychars (char *new, char *copy, int newsize, int *jx) {
   int kx = 0;
   while (copy[kx] != 0) {
     /* Make sure no buffer overflow */
-    if (*jx == newsize) {
+    if (*jx >= newsize) {
       fprintf(stderr, "Expansion too long.\n");
       return -1;
     }
