@@ -365,7 +365,6 @@ void siginthandler (int sig) {
   /* Send SIGINT to process being waited on */
   kill(waitingon, sig);
   gotsigint = 1;
-  printf("\n");
   signal(sig, SIG_IGN);
   signal(SIGINT, siginthandler);
   return;
