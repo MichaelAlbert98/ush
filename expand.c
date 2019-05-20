@@ -186,7 +186,7 @@ int specprocess (char *orig, char *new, int newsize, int *ix, int *jx) {
     if (pl > 0) {
       int status;
       waitingon = pl;
-      if (waitpid(pl, &status, 0) < 0) {
+      if (waitpid(pl, &status, WNOHANG) < 0) {
         /* Wait wasn't successful */
         perror ("wait");
         return -1;
@@ -196,6 +196,11 @@ int specprocess (char *orig, char *new, int newsize, int *ix, int *jx) {
       if (WIFEXITED(status)) {
         dollarques = WEXITSTATUS(status);
       }
+    }
+    /* Make sure no buffer overflow */
+    if (*jx >= newsize) {
+      fprintf(stderr, "Expansion too long.\n");
+      return -1;
     }
   }
 
