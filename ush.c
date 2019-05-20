@@ -365,6 +365,7 @@ void siginthandler (int sig) {
   /* Send SIGINT to process being waited on */
   kill(waitingon, sig);
   gotsigint = 1;
+  printf("\n");
   signal(sig, SIG_IGN);
   signal(SIGINT, siginthandler);
   return;
@@ -372,6 +373,7 @@ void siginthandler (int sig) {
 
 void killzombies() {
   /* Wait for any zombies */
-  while(waitpid(-1, NULL, WNOHANG) > 0);
+  while(wait(NULL) > 0);
+  //while(waitpid(-1, NULL, WNOHANG) > 0);
   return;
 }
